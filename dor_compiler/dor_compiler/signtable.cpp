@@ -1,26 +1,34 @@
 #include "signtable.h"
 table* cur_table = NULL;
 vector<table*>table_set;
+vector<string> string_set;
 table * table::get_func(string name) {
 	for (auto &i : table_set)
 		if (i->name == name)
 			return i;
+	return table_set[0];
 }
-table_entry::table_entry(string name, int kind, int type,int addr ,int value =0 ){
+table_entry::table_entry(string name, int kind, int type,int addr ,int value ){
 	this->kind = kind;
 	this->type = type;
 	this->name = name;
 	this->addr = addr;
 	this->value = value;
 	this->belong_table = cur_table;
+	this->has_reg = false;
+
 }
-table_entry::table_entry(string name, int kind, int type, table * function_table,int addr ,int value =0) {
+table_entry::table_entry(string name, int kind, int type, table * function_table,int addr ,int value) {
 	this->kind = kind;
 	this->type = type;
 	this->name = name;
 	this->addr = addr;
 	this->value = value;
 	this->belong_table = function_table;
+	this->has_reg = false;
+
+}
+table_entry::table_entry() {
 
 }
 
@@ -30,11 +38,18 @@ table::table(string name) {
 	this->func_params_count = 0;
 	this->func_tag = false;
 }
-
+table::table(string name, int type, table* father, bool is_main) {
+	this->name = name;
+	this->tablesize = 0;
+	this->func_params_count = 0;
+	this->func_tag = false;
+	this->type = type;
+	this->father = father;
+}
 int table::insert_function(string name,int type, table* func,bool is_main) {
 	if (already_has(name))
 		return -1;
-	if (!is_main)
+	if (1)
 	{
 		if (type == 0)
 		{
@@ -43,7 +58,7 @@ int table::insert_function(string name,int type, table* func,bool is_main) {
 		}else
 		{
 			table_entry new_func_te = table_entry(name, FUNC, type, func, this->tablesize);
-			this->tablesize += 4;
+			//this->tablesize += 4;
 			entries.push_back(new_func_te);
 		}
 		
@@ -52,7 +67,7 @@ int table::insert_function(string name,int type, table* func,bool is_main) {
 
 }
 
-int table::insert_const(string name, int type ,int value =0 ) {
+int table::insert_const(string name, int type ,int value ) {
 	if (already_has(name)) return -1;
 
 	table_entry new_const_te = table_entry(name, CONST, type,this->tablesize ,value );
@@ -98,7 +113,7 @@ table_entry table::get_et(string name) {
 bool table::is_const(string name) {
 	for(auto& i : this->entries)
 		if (i.name == name) {
-			return (i.type == CONST) ? true : false;
+			return (i.kind == CONST) ? true : false;
 		}
 	if (this->father != NULL)
 		return father->is_const(name);
@@ -109,7 +124,7 @@ bool table::is_array(string name)
 {
 	for (auto& i : this->entries)
 		if (i.name == name) {
-			return (i.type == ARR) ? true : false;
+			return (i.kind == ARR) ? true : false;
 		}
 	if (this->father != NULL)
 		return father->is_array(name);
@@ -118,7 +133,7 @@ bool table::is_array(string name)
 bool table::is_func(string name) {
 	for (auto& i : this->entries)
 		if (i.name == name) {
-			return (i.type == FUNC) ? true : false;
+			return (i.kind == FUNC) ? true : false;
 		}
 	if (this->father != NULL)
 		return father->is_func(name);
@@ -127,7 +142,7 @@ bool table::is_func(string name) {
 bool table::is_var(string name) {
 	for (auto& i : this->entries)
 		if (i.name == name) {
-			return (i.type == VAR|| i.type== PARAM) ? true : false;
+			return (i.kind == VAR|| i.kind== PARAM) ? true : false;
 		}
 	if (this->father != NULL)
 		return father->is_var(name);
@@ -143,8 +158,72 @@ int table::insert_param(string name, int type) {
 }
 
 bool table::already_has(string name) {
+	if (this->entries.empty()) return false;
 	for (auto &i : this->entries)
 		if (i.name == name)
 			return true;
 	return false;
+}
+
+
+/////ÐÂÔöº¯Êý
+bool table::find_sreg(string name) {
+	for (auto& it : this->local_s_pool) {
+		if (it.second == name)
+			return true;
+	}
+	return false;
+}
+string table::get_sreg(string name) {
+	for (auto& it : this->local_s_pool)
+	{
+		if (it.second == name)
+			return  "$s"+to_string(it.first) ;
+	}
+	return "";
+}
+
+string table::get_addr(string name) {
+	for (auto& it : this->entries) {
+		if (it.name == name)
+			return  to_string(it.addr) + "($fp)";
+	}
+	if (this->father != NULL)
+	{
+		for (auto& it : this->father->entries)
+		{
+			if (it.name == name)
+				return to_string(it.addr) + "($gp)";
+		}
+	}
+	else
+	{
+		cout << "get addr_wrong" << endl;
+		getchar();
+	}
+	return "";
+
+}
+
+int table::get_a_offset(string name) {
+	for (auto& it : this->entries) {
+		if (it.name == name)
+			return  it.addr;
+	}
+}
+
+bool table::is_local(string sname){
+	for (auto &it : this->entries) {
+		if (it.name == sname)
+			return true;
+	}
+	return false;
+
+}
+
+int table::get_tbs(string sname) {
+	for (auto &it : table_set) {
+		if (it->name == sname)
+			return it->tablesize;
+	}
 }

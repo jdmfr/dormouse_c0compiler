@@ -1,0 +1,525 @@
+CONST  int  g_const_ia  4
+CONST  int  g_const_ib  1
+CONST  int  g_const_ic  0
+CONST  char  g_const_plus  43
+CONST  char  g_const_minus  45
+CONST  int  int_const_c  0
+CONST  int  int_const_d  0
+CONST  int  int_const_e  -3
+CONST  int  int_const_f  -4
+VAR  int    g_int_a
+ARRAY  int  g_arr_a  1000
+VAR  int    g_int_32
+VAR  char    _g_ch_r
+ARRAY  char  _g_str_r  1000
+ARRAY  int  g_qsa  20
+FUNC  void    pr_glo_and_local_test
+CONST  int  l_const_ia  3
+CONST  int  l_const_ic  -1
+CONST  int  l_const_id  -2
+CONST  char  l_const_cha  65
+VAR  char    l_chb
+VAR  char    l_chc
+VAR  char    l_ch5
+VAR  char    l_mul
+VAR  int    l_const_ib
+VAR  char    l_chd
+=  1    g_int_a
+=  66    l_chb
+=  67    l_chc
+=  53    l_ch5
+=  42    l_mul
+=  2    l_const_ib
+=  68    l_chd
+PRTS      $string0
+PRTC      l_ch5
+PRTI      g_const_ia
+PRTI      l_const_ia
+PRTI      l_const_ib
+PRTI      g_const_ib
+PRTI      g_const_ic
+PRTI      l_const_ic
+PRTI      l_const_id
+PRTI      int_const_e
+PRTI      int_const_f
+PRTS      $string1
+PRTC      l_const_cha
+PRTC      l_chb
+PRTC      l_chc
+PRTC      l_chd
+PRTS      $string2
+PRTC      g_const_plus
+PRTC      l_mul
+FUNC  int    foo1
+RET      1
+FUNC  char    foo2
+PARA  char    x
+RET      x
+FUNC  char    foo3
+RET      98
+FUNC  void    op_test
+PARA  int    param_1
+PARA  char    param_2
+VAR  int    l_32
+ARRAY  int    l_e
+VAR  int    l_b
+VAR  int    l_c
+VAR  int    l_d
+CALL      foo1
++  $RET  31  @dor0
+=  @dor0    l_32
+=  l_32    g_int_32
+=  114    _g_ch_r
+CALL      foo1
+/  34  $RET  @dor1
++  68  @dor1  @dor2
+=  @dor2    l_d
+-  l_d  1  @dor3
+=  @dor3    l_c
+-  68  67  @dor4
+CALL      foo1
+-  @dor4  $RET  @dor5
++  @dor5  param_2  @dor6
+=  @dor6    l_b
+[]=  param_1  1  l_e
+*  l_d  25  @dor7
+*  3  4  @dor8
+/  @dor8  2  @dor9
++  @dor7  @dor9  @dor10
+*  5  3  @dor11
+-  @dor10  @dor11  @dor12
++  l_c  1  @dor13
+-  l_d  @dor13  @dor14
++  @dor12  @dor14  @dor15
++  @dor15  l_b  @dor16
+[]=  @dor16  0  l_e
+=[]  l_e  0  @dor17
+bne  @dor17  _g_ch_r  label.0
+PRTS      $string3
+GOTO      label.1
+label.0:
+label.1:
+RET      
+FUNC  int    while_switch
+VAR  int    i
+VAR  char    ch
+=  97    ch
+LOOP      
+label.2:
+bne  ch  97  label.4
+PRTS      $string4
+=  98    ch
+GOTO      label.3
+label.4:
+bne  ch  98  label.5
+PRTS      $string5
+=  99    ch
+GOTO      label.3
+label.5:
+bne  ch  99  label.6
+PRTS      $string6
+=  100    ch
+GOTO      label.3
+label.6:
+label.3:
+bne  ch  100  label.2
+LOOPEND      
+-  g_const_ib  1  @dor18
+=  @dor18    i
+LOOP      
+label.7:
+/  32  32  @dor19
+-  i  @dor19  @dor20
++  @dor20  1  @dor21
+bne  @dor21  0  label.9
+=  1    i
+GOTO      label.8
+label.9:
+bne  @dor21  1  label.10
++  i  1  @dor22
+=  @dor22    i
+GOTO      label.8
+label.10:
+bne  @dor21  2  label.11
+-  0  32  @dor23
+=  @dor23    i
+GOTO      label.8
+label.11:
+label.8:
+bge  i  0  label.7
+LOOPEND      
+-  0  g_int_32  @dor24
+beq  i  @dor24  label.12
+PRTS      $string7
+GOTO      label.13
+label.12:
+PRTS      $string8
++  97  0  @dor25
+=  @dor25    i
+label.13:
+LOOP      
+label.14:
+bne  i  97  label.16
+PRTS      $string9
+LOOP      
+label.17:
++  i  1  @dor26
+=  @dor26    i
++  99  0  @dor27
+blt  i  @dor27  label.17
+LOOPEND      
+GOTO      label.15
+label.16:
+bne  i  99  label.18
+LOOP      
+label.19:
+CALL      foo1
++  i  $RET  @dor28
+=  @dor28    i
++  100  0  @dor29
+beq  i  @dor29  label.19
+LOOPEND      
+GOTO      label.15
+label.18:
+bne  i  -32  label.20
+PRTS      $string10
+GOTO      label.15
+label.20:
++  105  0  @dor30
+beq  i  @dor30  label.21
+PRTS      $string11
++  i  1  @dor31
+=  @dor31    i
+GOTO      label.22
+label.21:
+PRTS      $string12
+RET      1
+label.22:
+label.15:
+bne  1  0  label.14
+LOOPEND      
+RET      0
+FUNC  void    while_switch_test
+PRTS      $string13
+CALL      while_switch
+beq  $RET  0  label.23
+PRTS      $string14
+GOTO      label.24
+label.23:
+label.24:
+FUNC  void    if_and_glo_loc_test
+CONST  int  _g_ch_r  1
+CONST  char  g_int_a  97
+VAR  int    i
+VAR  int    ch1
+VAR  int    g_const_ia
+VAR  int    g_const_plus
+VAR  char    g_const_ib
+VAR  char    g_const_minus
+=  0    i
+=  _g_ch_r    g_const_ia
+bne  g_const_ia  4  label.25
+PRTS      $string15
+GOTO      label.26
+label.25:
+bne  g_const_ia  1  label.27
+GOTO      label.28
+label.27:
+PRTS      $string16
+label.28:
+label.26:
+=  2    g_const_ia
++  g_const_ia  i  @dor32
++  @dor32  1  @dor33
+=  @dor33    g_const_plus
+=  98    g_const_ib
+=  43    g_const_minus
++  int_const_c  10  @dor34
+=  @dor34    ch1
+bne  g_const_ia  2  label.29
+bne  g_int_a  97  label.30
+ble  g_const_ib  50  label.31
+bge  g_const_plus  4  label.32
+blt  g_const_minus  43  label.33
+bgt  g_const_minus  43  label.34
++  ch1  6  @dor35
+=  @dor35    ch1
+GOTO      label.35
+label.34:
+label.35:
+GOTO      label.36
+label.33:
+PRTS      $string17
+label.36:
+GOTO      label.37
+label.32:
+label.37:
+GOTO      label.38
+label.31:
+label.38:
+GOTO      label.39
+label.30:
+label.39:
+GOTO      label.40
+label.29:
+PRTS      $string18
+label.40:
+beq  ch1  16  label.41
+PRTS      $string19
+GOTO      label.42
+label.41:
+PRTS      $string20
+label.42:
+RET      
+FUNC  void    array_test
+VAR  int    i
+VAR  int    sum
+VAR  int    answer
+=  0    i
+=  0    answer
+LOOP      
+label.43:
++  i  1  @dor36
+[]=  @dor36  i  g_arr_a
++  i  1  @dor37
+=  @dor37    i
+ble  i  999  label.43
+LOOPEND      
+=  0    sum
+=  0    i
+LOOP      
+label.44:
+=[]  g_arr_a  i  @dor38
++  sum  @dor38  @dor39
+=  @dor39    sum
++  i  g_const_ib  @dor40
+=  @dor40    i
+blt  i  1000  label.44
+LOOPEND      
+PRTS      $string21
+PRTI      sum
+bne  sum  5050  label.45
+GOTO      label.46
+label.45:
++  answer  3  @dor41
+=  @dor41    answer
+label.46:
+[]=  97  97  _g_str_r
+=[]  _g_str_r  97  @dor42
+bne  @dor42  97  label.47
++  answer  3  @dor43
+=  @dor43    answer
+GOTO      label.48
+label.47:
++  answer  1024  @dor44
+=  @dor44    answer
+label.48:
+PRTS      $string22
+PRTI      answer
+RET      
+FUNC  int    quick_sort
+PARA  int    low
+PARA  int    high
+VAR  int    i
+VAR  int    j
+VAR  int    x
+VAR  int    flag
+bge  low  high  label.49
+=  low    i
+=  high    j
+=[]  g_qsa  i  @dor45
+=  @dor45    x
+=  0    flag
+LOOP      
+label.50:
+LOOP      
+label.51:
+bge  i  j  label.52
+=[]  g_qsa  j  @dor46
+ble  @dor46  x  label.53
+-  j  1  @dor47
+=  @dor47    j
+GOTO      label.54
+label.53:
+=  1    flag
+label.54:
+GOTO      label.55
+label.52:
+=  1    flag
+label.55:
+beq  flag  0  label.51
+LOOPEND      
+bge  i  j  label.56
+=[]  g_qsa  j  @dor48
+[]=  @dor48  i  g_qsa
++  i  1  @dor49
+=  @dor49    i
+=  0    flag
+GOTO      label.57
+label.56:
+label.57:
+LOOP      
+label.58:
+bge  i  j  label.59
+=[]  g_qsa  i  @dor50
+bge  @dor50  x  label.60
++  i  1  @dor51
+=  @dor51    i
+GOTO      label.61
+label.60:
+=  1    flag
+label.61:
+GOTO      label.62
+label.59:
+=  1    flag
+label.62:
+beq  flag  0  label.58
+LOOPEND      
+bge  i  j  label.63
+=[]  g_qsa  i  @dor52
+[]=  @dor52  j  g_qsa
+-  j  1  @dor53
+=  @dor53    j
+=  0    flag
+GOTO      label.64
+label.63:
+label.64:
+blt  i  j  label.50
+LOOPEND      
+[]=  x  i  g_qsa
+PUSH    quick_sort  low
+-  i  1  @dor54
+PUSH    quick_sort  @dor54
+CALL      quick_sort
++  i  1  @dor55
+PUSH    quick_sort  @dor55
+PUSH    quick_sort  high
+CALL      quick_sort
+GOTO      label.65
+label.49:
+label.65:
+RET      0
+FUNC  void    quick_sort_test
+VAR  int    n
+VAR  int    key
+VAR  int    i
+=  0    i
+PRTS      $string23
+PRTS      $string24
+SCFI      n
+LOOP      
+label.66:
+bgt  n  0  label.67
+ble  n  20  label.68
+PRTS      $string25
+SCFI      n
+GOTO      label.69
+label.68:
+label.69:
+GOTO      label.70
+label.67:
+label.70:
+ble  n  0  label.66
+LOOPEND      
+LOOP      
+label.71:
+SCFI      key
+[]=  key  i  g_qsa
++  i  1  @dor56
+=  @dor56    i
+blt  i  n  label.71
+LOOPEND      
+PUSH    quick_sort  0
+-  n  1  @dor57
+PUSH    quick_sort  @dor57
+CALL      quick_sort
+=  0    i
+LOOP      
+label.72:
+=[]  g_qsa  i  @dor58
+PRTI      @dor58
++  i  1  @dor59
+=  @dor59    i
+blt  i  n  label.72
+LOOPEND      
+RET      
+FUNC  int    gcd
+PARA  int    a
+PARA  int    b
+VAR  int    tmp
+ble  b  0  label.73
+/  a  b  @dor60
+*  @dor60  b  @dor61
+-  a  @dor61  @dor62
+=  @dor62    tmp
+PUSH    gcd  b
+PUSH    gcd  tmp
+CALL      gcd
+RET      $RET
+GOTO      label.74
+label.73:
+RET      a
+label.74:
+FUNC  void    gcd_test
+VAR  int    m
+VAR  int    answer
+VAR  int    n
+PRTS      $string26
+PRTS      $string27
+SCFI      m
+LOOP      
+label.75:
+bge  m  0  label.76
+PRTS      $string28
+SCFI      m
+GOTO      label.77
+label.76:
+label.77:
+blt  m  0  label.75
+LOOPEND      
+SCFI      n
+LOOP      
+label.78:
+bge  n  0  label.79
+PRTS      $string28
+SCFI      n
+GOTO      label.80
+label.79:
+label.80:
+blt  n  0  label.78
+LOOPEND      
+PUSH    gcd  m
+PUSH    gcd  n
+CALL      gcd
+=  $RET    answer
+PRTS      $string29
+PRTI      answer
+FUNC  void    main
+VAR  int    i
+PRTS      $string30
+PRTS      $string31
+SCFI      i
+CALL      pr_glo_and_local_test
+bne  i  0  label.81
+PUSH    op_test  1
+PUSH    foo2  98
+CALL      foo2
+PUSH    op_test  $RET
+CALL      op_test
+GOTO      label.82
+label.81:
+PUSH    op_test  1
+CALL      foo3
+PUSH    op_test  $RET
+CALL      op_test
+label.82:
+CALL      while_switch_test
+CALL      if_and_glo_loc_test
+CALL      array_test
+beq  i  0  label.83
+CALL      quick_sort_test
+CALL      gcd_test
+GOTO      label.84
+label.83:
+label.84:
+RET      

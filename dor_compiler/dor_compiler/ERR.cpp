@@ -48,8 +48,10 @@ string ERR::err_msg[] = {
 	//29非法EXP
 	//30 only default
 	//31 case类型错误
+	//32 return 错误
+	//33 非法标识符
 };
-void ERR::error(int error_num , int process_way=0) {
+void ERR::error(int error_num , int process_way) {
 
 	error_count++;
 	cout << err_msg[error_num] << "  At " << line_count << ":" << pos_num  << endl;

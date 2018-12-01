@@ -38,16 +38,32 @@ static 	table * get_func(string name);
 	bool already_has(string name);
 	table_entry get_et(string name);
 
+	
+	////目标代码生成阶段的新增函数
+
+	string get_const_value(string name);
+
+	map <int,string>  local_s_pool;
+	bool find_sreg(string name);
+	string get_sreg(string name);
+	string get_addr(string name);
+	int get_a_offset(string name);
+	bool is_local(string sname);
+	static int get_tbs(string sname);
 };
 
 class table_entry {
 	public:
-	table* belong_table;
 	string name;
-	int kind; 
+	int kind;
 	int type;
 	int value;  //array length
 	int addr;
+	table* belong_table;
+	
+	bool has_reg;
+	string reg;
+
 	table_entry();
 	table_entry(string name, int kind, int type ,int addr ,int value=0 );//func param array var const 
 	table_entry(string name, int kind, int type, table* function_table ,int addr, int value =0 );
@@ -55,6 +71,6 @@ class table_entry {
 
 extern table *cur_table;
 extern vector<table*>table_set;
-
+extern vector<string> string_set;
 #endif // !TABLE
 

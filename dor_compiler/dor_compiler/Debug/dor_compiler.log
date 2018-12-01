@@ -1,6 +1,7 @@
-﻿  dor_compiler.cpp
-  ERR.cpp
-  LEX_ANALYSIS.cpp
-  global.cpp
-  正在生成代码...
+﻿  Parse.cpp
+g:\code lab\dor_compiler\dor_compiler\parse.cpp(876): warning C4390: “;”: 找到空的受控语句；这是否是有意的?
+g:\code lab\dor_compiler\dor_compiler\parse.cpp(878): warning C4390: “;”: 找到空的受控语句；这是否是有意的?
+g:\code lab\dor_compiler\dor_compiler\parse.cpp(882): warning C4390: “;”: 找到空的受控语句；这是否是有意的?
+g:\code lab\dor_compiler\dor_compiler\parse.cpp(884): warning C4390: “;”: 找到空的受控语句；这是否是有意的?
+g:\code lab\dor_compiler\dor_compiler\parse.cpp(434): warning C4715: “Parse::const_sea”: 不是所有的控件路径都返回值
   dor_compiler.vcxproj -> G:\code lab\dor_compiler\Debug\dor_compiler.exe

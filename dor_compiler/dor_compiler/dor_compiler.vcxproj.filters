@@ -27,6 +27,21 @@
     <ClInclude Include="global.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="middle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="optim.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="signtable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Targetmips.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dor_compiler.cpp">
@@ -39,6 +54,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="global.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="middle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="optim.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="signtable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Targetmips.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,0 +1,474 @@
+void  pr_glo_and_local_test()
+VAR  char    l_chb
+VAR  char    l_chc
+VAR  char    l_ch5
+VAR  char    l_mul
+VAR  int    l_const_ib
+VAR  char    l_chd
+g_int_a = 1
+l_chb = 66
+l_chc = 67
+l_ch5 = 53
+l_mul = 42
+l_const_ib = 2
+l_chd = 68
+PRTS      $string0
+PRTC      l_ch5
+PRTI      g_const_ia
+PRTI      l_const_ia
+PRTI      l_const_ib
+PRTI      g_const_ib
+PRTI      g_const_ic
+PRTI      l_const_ic
+PRTI      l_const_id
+PRTI      int_const_e
+PRTI      int_const_f
+PRTS      $string1
+PRTC      l_const_cha
+PRTC      l_chb
+PRTC      l_chc
+PRTC      l_chd
+PRTS      $string2
+PRTC      g_const_plus
+PRTC      l_mul
+int  foo1()
+RET      1
+char  foo2()
+parachar  x
+RET      x
+char  foo3()
+RET      98
+void  op_test()
+paraint  param_1
+parachar  param_2
+VAR  int    l_32
+ARRAY  int    l_e
+VAR  int    l_b
+VAR  int    l_c
+VAR  int    l_d
+CALL      foo1
+@dor0  =  $RET  +  31
+l_32 = @dor0
+g_int_32 = l_32
+_g_ch_r = 114
+CALL      foo1
+@dor1  =  34  /  $RET
+@dor2  =  68  +  @dor1
+l_d = @dor2
+@dor3  =  l_d  -  1
+l_c = @dor3
+@dor4  =  68  -  67
+CALL      foo1
+@dor5  =  @dor4  -  $RET
+@dor6  =  @dor5  +  param_2
+l_b = @dor6
+l_e[1]  =  param_1
+@dor7  =  l_d  *  25
+@dor8  =  3  *  4
+@dor9  =  @dor8  /  2
+@dor10  =  @dor7  +  @dor9
+@dor11  =  5  *  3
+@dor12  =  @dor10  -  @dor11
+@dor13  =  l_c  +  1
+@dor14  =  l_d  -  @dor13
+@dor15  =  @dor12  +  @dor14
+@dor16  =  @dor15  +  l_b
+l_e[0]  =  @dor16
+@dor17  =  l_e[0]
+if ( @dor17  bne  _g_ch_r ) label.0
+PRTS      $string3
+GOTO      label.1
+label.0:
+label.1:
+RET      
+int  while_switch()
+VAR  int    i
+VAR  char    ch
+ch = 97
+label.2:
+bne  ch  97  label.4
+PRTS      $string4
+ch = 98
+GOTO      label.3
+label.4:
+bne  ch  98  label.5
+PRTS      $string5
+ch = 99
+GOTO      label.3
+label.5:
+bne  ch  99  label.6
+PRTS      $string6
+ch = 100
+GOTO      label.3
+label.6:
+label.3:
+if ( ch  bne  100 ) label.2
+@dor18  =  g_const_ib  -  1
+i = @dor18
+label.7:
+@dor19  =  32  /  32
+@dor20  =  i  -  @dor19
+@dor21  =  @dor20  +  1
+bne  @dor21  0  label.9
+i = 1
+GOTO      label.8
+label.9:
+bne  @dor21  1  label.10
+@dor22  =  i  +  1
+i = @dor22
+GOTO      label.8
+label.10:
+bne  @dor21  2  label.11
+@dor23  =  0  -  32
+i = @dor23
+GOTO      label.8
+label.11:
+label.8:
+if ( i  bge  0 ) label.7
+@dor24  =  0  -  g_int_32
+if ( i  beq  @dor24 ) label.12
+PRTS      $string7
+GOTO      label.13
+label.12:
+PRTS      $string8
+@dor25  =  97  +  0
+i = @dor25
+label.13:
+label.14:
+bne  i  97  label.16
+PRTS      $string9
+label.17:
+@dor26  =  i  +  1
+i = @dor26
+@dor27  =  99  +  0
+if ( i  blt  @dor27 ) label.17
+GOTO      label.15
+label.16:
+bne  i  99  label.18
+label.19:
+CALL      foo1
+@dor28  =  i  +  $RET
+i = @dor28
+@dor29  =  100  +  0
+if ( i  beq  @dor29 ) label.19
+GOTO      label.15
+label.18:
+bne  i  -32  label.20
+PRTS      $string10
+GOTO      label.15
+label.20:
+@dor30  =  105  +  0
+if ( i  beq  @dor30 ) label.21
+PRTS      $string11
+@dor31  =  i  +  1
+i = @dor31
+GOTO      label.22
+label.21:
+PRTS      $string12
+RET      1
+label.22:
+label.15:
+bne  1  0  label.14
+RET      0
+void  while_switch_test()
+PRTS      $string13
+CALL      while_switch
+beq  $RET  0  label.23
+PRTS      $string14
+GOTO      label.24
+label.23:
+label.24:
+void  if_and_glo_loc_test()
+VAR  int    i
+VAR  int    ch1
+VAR  int    g_const_ia
+VAR  int    g_const_plus
+VAR  char    g_const_ib
+VAR  char    g_const_minus
+i = 0
+g_const_ia = _g_ch_r
+if ( g_const_ia  bne  4 ) label.25
+PRTS      $string15
+GOTO      label.26
+label.25:
+if ( g_const_ia  bne  1 ) label.27
+GOTO      label.28
+label.27:
+PRTS      $string16
+label.28:
+label.26:
+g_const_ia = 2
+@dor32  =  g_const_ia  +  i
+@dor33  =  @dor32  +  1
+g_const_plus = @dor33
+g_const_ib = 98
+g_const_minus = 43
+@dor34  =  int_const_c  +  10
+ch1 = @dor34
+if ( g_const_ia  bne  2 ) label.29
+if ( g_int_a  bne  97 ) label.30
+if ( g_const_ib  ble  50 ) label.31
+if ( g_const_plus  bge  4 ) label.32
+if ( g_const_minus  blt  43 ) label.33
+if ( g_const_minus  bgt  43 ) label.34
+@dor35  =  ch1  +  6
+ch1 = @dor35
+GOTO      label.35
+label.34:
+label.35:
+GOTO      label.36
+label.33:
+PRTS      $string17
+label.36:
+GOTO      label.37
+label.32:
+label.37:
+GOTO      label.38
+label.31:
+label.38:
+GOTO      label.39
+label.30:
+label.39:
+GOTO      label.40
+label.29:
+PRTS      $string18
+label.40:
+if ( ch1  beq  16 ) label.41
+PRTS      $string19
+GOTO      label.42
+label.41:
+PRTS      $string20
+label.42:
+RET      
+void  array_test()
+VAR  int    i
+VAR  int    sum
+VAR  int    answer
+i = 0
+answer = 0
+label.43:
+@dor36  =  i  +  1
+g_arr_a[i]  =  @dor36
+@dor37  =  i  +  1
+i = @dor37
+if ( i  ble  999 ) label.43
+sum = 0
+i = 0
+label.44:
+@dor38  =  g_arr_a[i]
+@dor39  =  sum  +  @dor38
+sum = @dor39
+@dor40  =  i  +  g_const_ib
+i = @dor40
+if ( i  blt  1000 ) label.44
+PRTS      $string21
+PRTI      sum
+if ( sum  bne  5050 ) label.45
+GOTO      label.46
+label.45:
+@dor41  =  answer  +  3
+answer = @dor41
+label.46:
+_g_str_r[97]  =  97
+@dor42  =  _g_str_r[97]
+if ( @dor42  bne  97 ) label.47
+@dor43  =  answer  +  3
+answer = @dor43
+GOTO      label.48
+label.47:
+@dor44  =  answer  +  1024
+answer = @dor44
+label.48:
+PRTS      $string22
+PRTI      answer
+RET      
+int  quick_sort()
+paraint  low
+paraint  high
+VAR  int    i
+VAR  int    j
+VAR  int    x
+VAR  int    flag
+if ( low  bge  high ) label.49
+i = low
+j = high
+@dor45  =  g_qsa[i]
+x = @dor45
+flag = 0
+label.50:
+label.51:
+if ( i  bge  j ) label.52
+@dor46  =  g_qsa[j]
+if ( @dor46  ble  x ) label.53
+@dor47  =  j  -  1
+j = @dor47
+GOTO      label.54
+label.53:
+flag = 1
+label.54:
+GOTO      label.55
+label.52:
+flag = 1
+label.55:
+if ( flag  beq  0 ) label.51
+if ( i  bge  j ) label.56
+@dor48  =  g_qsa[j]
+g_qsa[i]  =  @dor48
+@dor49  =  i  +  1
+i = @dor49
+flag = 0
+GOTO      label.57
+label.56:
+label.57:
+label.58:
+if ( i  bge  j ) label.59
+@dor50  =  g_qsa[i]
+if ( @dor50  bge  x ) label.60
+@dor51  =  i  +  1
+i = @dor51
+GOTO      label.61
+label.60:
+flag = 1
+label.61:
+GOTO      label.62
+label.59:
+flag = 1
+label.62:
+if ( flag  beq  0 ) label.58
+if ( i  bge  j ) label.63
+@dor52  =  g_qsa[i]
+g_qsa[j]  =  @dor52
+@dor53  =  j  -  1
+j = @dor53
+flag = 0
+GOTO      label.64
+label.63:
+label.64:
+if ( i  blt  j ) label.50
+g_qsa[i]  =  x
+push    low
+@dor54  =  i  -  1
+push    @dor54
+CALL      quick_sort
+@dor55  =  i  +  1
+push    @dor55
+push    high
+CALL      quick_sort
+GOTO      label.65
+label.49:
+label.65:
+RET      0
+void  quick_sort_test()
+VAR  int    n
+VAR  int    key
+VAR  int    i
+i = 0
+PRTS      $string23
+PRTS      $string24
+SCFI      n
+label.66:
+if ( n  bgt  0 ) label.67
+if ( n  ble  20 ) label.68
+PRTS      $string25
+SCFI      n
+GOTO      label.69
+label.68:
+label.69:
+GOTO      label.70
+label.67:
+label.70:
+if ( n  ble  0 ) label.66
+label.71:
+SCFI      key
+g_qsa[i]  =  key
+@dor56  =  i  +  1
+i = @dor56
+if ( i  blt  n ) label.71
+push    0
+@dor57  =  n  -  1
+push    @dor57
+CALL      quick_sort
+i = 0
+label.72:
+@dor58  =  g_qsa[i]
+PRTI      @dor58
+@dor59  =  i  +  1
+i = @dor59
+if ( i  blt  n ) label.72
+RET      
+int  gcd()
+paraint  a
+paraint  b
+VAR  int    tmp
+if ( b  ble  0 ) label.73
+@dor60  =  a  /  b
+@dor61  =  @dor60  *  b
+@dor62  =  a  -  @dor61
+tmp = @dor62
+push    b
+push    tmp
+CALL      gcd
+RET      $RET
+GOTO      label.74
+label.73:
+RET      a
+label.74:
+void  gcd_test()
+VAR  int    m
+VAR  int    answer
+VAR  int    n
+PRTS      $string26
+PRTS      $string27
+SCFI      m
+label.75:
+if ( m  bge  0 ) label.76
+PRTS      $string28
+SCFI      m
+GOTO      label.77
+label.76:
+label.77:
+if ( m  blt  0 ) label.75
+SCFI      n
+label.78:
+if ( n  bge  0 ) label.79
+PRTS      $string28
+SCFI      n
+GOTO      label.80
+label.79:
+label.80:
+if ( n  blt  0 ) label.78
+push    m
+push    n
+CALL      gcd
+answer = $RET
+PRTS      $string29
+PRTI      answer
+void  main()
+VAR  int    i
+PRTS      $string30
+PRTS      $string31
+SCFI      i
+CALL      pr_glo_and_local_test
+if ( i  bne  0 ) label.81
+push    1
+push    98
+CALL      foo2
+push    $RET
+CALL      op_test
+GOTO      label.82
+label.81:
+push    1
+CALL      foo3
+push    $RET
+CALL      op_test
+label.82:
+CALL      while_switch_test
+CALL      if_and_glo_loc_test
+CALL      array_test
+if ( i  beq  0 ) label.83
+CALL      quick_sort_test
+CALL      gcd_test
+GOTO      label.84
+label.83:
+label.84:
+RET      

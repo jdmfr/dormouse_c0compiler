@@ -38,7 +38,7 @@ void pr_glo_and_local_test {
 	printf("print_string_and_ident_test::", l_const_chA);
 	printf(l_chB ); printf(l_chC ) ;  printf(l_chD );
 	printf( "print_operators_test::" );
-	printf(g_const_plus, g_const_minus);
+	printf(g_const_plus);
 	printf(l_mul);
 }
 
@@ -68,8 +68,8 @@ void op_test(int param_1 , char paRam_2 ){
 	l_d = 'D' +    34/foo1 ;	l_c=l_d-1;
 	l_b = ('D'-'C'-foo1) + paRam_2 ;
 	l_e[1] = param_1 ;
-	l_e[0] = l_d[1]*25 + 3*4 /2 -5*3 +(l_d-(l_c+1))+l_b;
-	if ( (l_e[0] == _g_ch_r ))
+	l_e[0] = l_d*25 + 3*4 /2 -5*3 +(l_d-(l_c+1))+l_b;
+	if ( l_e[0] == _g_ch_r )
 		printf("Hi_DorMouse:: op_test_passed!");
 	else ;
 
@@ -77,7 +77,19 @@ void op_test(int param_1 , char paRam_2 ){
 }
 
 int while_switch {
-	int i   ;	
+	int i   ;
+	
+	char ch ;
+    	ch='a';
+    	do switch(ch){
+     	   case 'a' :{ printf("This is a !");
+                    	ch='b';}
+        	  case 'b' : {printf("This is b !");
+                    	ch='c';}
+       	 case 'c' : {printf("This is c !");
+                   	 ch='d';}
+	default: ;
+                   }while(ch != 'd')
 
 	i = g_const_ib -1 ;
 	do 
@@ -94,28 +106,29 @@ int while_switch {
 		printf("while_switch_part1_ERROR!!!");
 	else {
 		printf("while_switch_part1_over...") ;
-		i = 'a';
+		i = 'a' + 0;
 	}
-	switch(i){
-		case 'f' : if(0) i=i+3 ; else i= i+4 ;
+	do switch(i){
 		case 97 : {
 				printf("while_switch_part2_start....");
-					do{i =i+1;}while(i <'c')
+					do{i =i+1;}while(i <'c' + 0)
 				}
-		case 'd' : 
-				do i=i+foo1; while(i == 'd')
-		case '-32' :
+		case 99 : 
+				do i=i+foo1; while(i == 'd' + 0)
+		case -32:
 			printf("while_switch_part1_still_ERROR!!!");
 		default : 
 			{
-				if ( i != 'i')
-					printf("while_switch_part2_ERROR!!!...");
+				if ( i != 'i'+0)
+				{	printf("while_switch_part2_should_cycle_4!!!...");
+					i=i+1;
+				}
 				else {
 					printf("while_switch_part2_over....");
 					return (1) ;	
 					}
 			}
-	}
+	}while(1)
 	return (0) ;
 
 } 
@@ -124,6 +137,7 @@ void while_switch_test {
 	printf("__Welcome__to__:: while_switch_test") ;
 	if ( while_switch )
 		printf("Hi_DorMouse:: while_switch_test_passed!");
+	else ;
 }
 
 
@@ -131,7 +145,7 @@ void if_and_glo_loc_test{
 	const int _g_ch_r =1 ;   
 	const char g_int_a = 'a' ;
 	int i ;
-	char ch1 ;
+	int ch1 ;
 	int g_const_ia  , g_const_plus  ;
 	char g_const_ib , g_const_minus ;
 	
@@ -194,14 +208,10 @@ void array_test {
 	if ( sum == 5050) ;
 	else answer= answer + 3 ; 
 
-	i = 0 ;
-	do{
-		_g_str_R[i] = i;
-		i = i+1 ;
-	}while(i<126)
+	_g_str_R[97]= 'a';
+
 	if (_g_str_R[97]=='a') answer=answer+3     ; else answer=answer+1024;
-	if (_g_str_R[32] != ' ') answer=answer+2048; else answer=answer+1 ;
-	printf("array_test_part_2_ans::",answer)
+	printf("array_test_part_2_ans::",answer);
 
 	return ;
 }
@@ -228,7 +238,7 @@ int quick_sort(int low ,int high ){
 				g_qsa[i]= g_qsa[j];
 				i= i + 1;
 				flag =0;
-			}
+			}else ;
 
 			do {
 				if(i<j)
@@ -242,14 +252,14 @@ int quick_sort(int low ,int high ){
 				g_qsa[j]= g_qsa[i];
 				j= j - 1;
 				flag =0;
-			}
+			} else ;
 		}while(i<j)
 		g_qsa[i]=x;
 		quick_sort(low,i-1);
 		quick_sort(i+1,high);
 	}
-
-
+	else ;
+	return (0);
 }
 
 void quick_sort_test {
@@ -281,7 +291,7 @@ void quick_sort_test {
 	do{
 		printf(g_qsa[i] );
 		i=i+1 ;
-	}while(i<n-1)
+	}while(i<n)
 
 	return ;
 }
@@ -305,13 +315,15 @@ void gcd_test {
 			printf("Invalid integer ,sorry,agian please::");
 			scanf(m);
 		}
-	} while( n < 0)
+		else ;
+	} while( m < 0)
 	scanf(n);
 	do{
 		if(n<0){
 			printf("Invalid integer ,sorry,agian please::");
 			scanf(n);
 		}
+		else ;
 	} while( n < 0)
 	answer = gcd(m,n);
 	printf("answer is:: ",answer);
@@ -335,12 +347,7 @@ void main(){
 	{	quick_sort_test;
 		gcd_test;
 	}
+	else ;
+	return ;
 }
 
-
-
-
-char  c = "asf" ;
-char a ! = 'a" ;
-char b = '^' ;
-^ ; 

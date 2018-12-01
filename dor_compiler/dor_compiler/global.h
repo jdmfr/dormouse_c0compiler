@@ -5,6 +5,7 @@
 #include<utility>
 #include<stdlib.h>
 #include<fstream>
+#include <vector>
 
 ////////////////error/////////////
 #define LACK_QUOTE 1 
@@ -28,3 +29,5 @@ extern int pos_num;
 extern int line_count;
 extern int line_l;
 extern int error_count;
+
+extern ofstream mid_output_co, mid_output_real, mips_output;

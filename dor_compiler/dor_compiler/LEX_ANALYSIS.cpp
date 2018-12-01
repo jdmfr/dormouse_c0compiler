@@ -1,5 +1,6 @@
 #pragma once
 #include "LEX_ANALYSIS.h"
+#define WATCH_LINE 0
 map<string,int> WordMap;
 int LEX_ANALYSIS::id_count=0;
 int LEX_ANALYSIS::sym_num=0;
@@ -45,6 +46,11 @@ bool LEX_ANALYSIS::is_compop(int token) {
 }
 
 void LEX_ANALYSIS::get_token(){
+	if (WATCH_LINE&& WATCH_LINE == line_count)
+	{
+		cout << "1!!!!!!" << endl;
+	}
+	
     while(ch==' '||ch=='\t'||ch=='\n' )
     {
         getch();
@@ -58,67 +64,86 @@ void LEX_ANALYSIS::get_token(){
         parse_num();
         token=TK_num;
     }
-    else switch(ch){
-    case '+':
-        token= TK_plus;
-        getch();
-        break;
-    case '-':
-        token= TK_minus;
-        getch();
-        break;
-    case '*':
-        token= TK_mul;
-        getch();
-        break;
-    case '/':
-        token= TK_div;
-        getch();
-        break;
-    case '=':
-        getch();
-        if(ch== '=')
-        {
-            token= TK_eq ;
-            getch();
-            break;
-        }
-        else token=TK_assign ;
-        break;
-    case '!':
-        getch();
-        if(ch=='=')
-        {
-            getch();
-            token=TK_neq;
-            break;
-        }
-        else{
-			ERR::error(SH_NEQ, 0);
-			token=TK_neq;//error
+	else switch (ch) {
+	case '+':
+		token = TK_plus;
+		sym = "+";
+		getch();
+		break;
+	case '-':
+		token = TK_minus;
+		sym = "-";
+		getch();
+		break;
+	case '*':
+		token = TK_mul;
+		sym = "*";
+		getch();
+		break;
+	case '/':
+		token = TK_div;
+		sym = "/";
+		getch();
+		break;
+	case '=':
+		getch();
+		if (ch == '=')
+		{
+			token = TK_eq;
+			sym = "==";
+			getch();
+			break;
 		}
-        break;
-    case '<':
-        getch();
-        if(ch=='=')
-        {
-            getch();
-            token=TK_leq;
-        }
-        else token=TK_les;
+		else {
+			token = TK_assign;
+			sym = "=";
+		}
+		break;
+	case '!':
+		getch();
+		if (ch == '=')
+		{
+			getch();
+			sym = "!=";
+			token = TK_neq;
+			break;
+		}
+		else {
+			ERR::error(SH_NEQ, 0);
+			token = TK_neq;//error
+		}
+		break;
+	case '<':
+		getch();
+		if (ch == '=')
+		{
+			getch();
+			sym = "<=";
+			token = TK_leq;
+		}
+		else 
+		{	token = TK_les;
+			sym = "<";
+		}
         break;
     case '>':
         getch();
         if(ch=='=')
         {
             getch();
+			sym = ">=";
             token=TK_geq;
         }
-        else token=TK_gt;
+		
+		else {
+			token = TK_gt;
+			sym = ">";
+			}
         break;
     case ':':
         getch();
         token=TK_colon;
+		break;
     case ';':
         getch();
         token=TK_semicolon;
@@ -239,11 +264,13 @@ int LEX_ANALYSIS::getch(){
 			line_l = cur_line.length();
 			ch = cur_line[pos_num++];
 		}
+
+
 		else ch = EOF;
 		return -1;
 
     }
-    return 0;
+
 }//getch 中不对sym操作，保证了sym的干净
 
 void LEX_ANALYSIS::parse_identifier(){

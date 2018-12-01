@@ -1,7 +1,8 @@
 #include "global.h"
 #include "LEX_ANALYSIS.h"
 #include <iostream>
-
+#include "Parse.h"
+#include "Targetmips.h"
 using namespace std;
 
 void pregroess(){
@@ -27,15 +28,26 @@ void pregroess(){
 int main()
 {
 	error_count = 0;
+
+	mid_output_co.open("mid_output_co.txt");
+	mid_output_real.open("mid_output_real.txt");
+	mips_output.open("mips.asm");
+
 	pregroess();
 	if (LEX_ANALYSIS::readfile() == 0)
-		while (1)
+		Parse::program();
+/*		while (1)
 		{
 			LEX_ANALYSIS::get_token();
 			LEX_ANALYSIS::print();
 			if (token==TK_eof)
 				break;
 		}
+*/
+  	Targetmips::generator();
+	mid_output_co.close();
+	mid_output_real.close();
+	mips_output.close();
 	getchar();
 	getchar();
 	return 0;

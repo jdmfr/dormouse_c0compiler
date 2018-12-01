@@ -2,9 +2,10 @@
 #include "global.h"
 
 
-static class Parse
+class Parse
 {
 public:
+	static int const_sea(int & type, int & result);
 	static int program();
 	static int func_decl(int type ,string name );
 	static int const_decl();
