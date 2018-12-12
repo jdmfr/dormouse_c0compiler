@@ -4,6 +4,7 @@
 #include "signtable.h"
 #include "middle.h"
 #include "string"
+#include "stack"
 #define PARSE_DEBUG 1
 
 string type2str[4] = { "","void","int","char" };
@@ -684,7 +685,7 @@ int Parse::statement() {
 		if (PARSE_DEBUG)
 			cout << "this is a blank statement" << endl;
 	}
-	else if (token == TK_ident) {
+	else if (token == TK_ident) {    //处理赋值语句
 		string name = sym;
 		LEX_ANALYSIS::get_token();
 		if (cur_table->is_var(name)||cur_table->is_const(name))
@@ -765,10 +766,13 @@ int Parse::statement() {
 				if (para_count!=should_para_count /*wrong params count */)
 				{
 					ERR::error(20, 0);
-					(TK_semicolon);
+					skip_until(TK_semicolon);
 					return -1;
 				}
-
+				else if (para_count != 0)
+				{
+					param_push_midgen(name, para_count);
+				}
 
 				middle::genmid("CALL", "", "", name); //midcode call func  
 
@@ -935,7 +939,7 @@ int Parse::statement() {
 				return -1;
 			}
 			LEX_ANALYSIS::get_token();
-			if (expression(type, expname)!= 0){
+			if (expression(type, expname)!=0 ){
 				ERR::error(32, 0);
 				skip_until(TK_semicolon);
 				LEX_ANALYSIS::get_token();
@@ -1123,11 +1127,12 @@ int Parse::factor(int &type, string &result) {
 
 		if (cur_table->is_array(name)) //is_array
 		{
+			int  type1=0;
 			LEX_ANALYSIS::get_token();
-
+			type = cur_table->get_type(name);
 			check(TK_lbrack);
 			LEX_ANALYSIS::get_token();
-		    if (expression(type, subscript) != 0) {
+		    if (expression(type1, subscript) != 0) {
 				ERR::error(23, 0);
 				skip_until(TK_rbrack);
 				LEX_ANALYSIS::get_token();
@@ -1183,6 +1188,11 @@ int Parse::factor(int &type, string &result) {
 					skip_until(TK_semicolon);
 					return -1;
 				}
+				else if (params_num != 0)
+				{
+					param_push_midgen(name,params_num);
+				}
+
 				check(TK_rparen);
 				LEX_ANALYSIS::get_token();
 				//这里千万注意别重复读下一个字符
@@ -1192,7 +1202,9 @@ int Parse::factor(int &type, string &result) {
 			//assign
 
 			middle::genmid("CALL", "", "", func_t->name);
-			result = "$RET";
+			result = new_local_t();
+			middle::genmid("=", "$RET", "", result);
+			
 		}
 		else
 		{
@@ -1208,9 +1220,10 @@ int Parse::factor(int &type, string &result) {
 		if (token == TK_minus)
 			flag = 1;
 		LEX_ANALYSIS::get_token();
-		if (check(TK_num) != 0) result = "0";
+		if (check(TK_num) != 0) result = "0";//TODO
 		else if (flag)
 			result = "-" + to_string(LEX_ANALYSIS::sym_num);
+		else result = to_string(LEX_ANALYSIS::sym_num);
 		LEX_ANALYSIS::get_token();
 
 	}
@@ -1246,6 +1259,8 @@ int Parse::factor(int &type, string &result) {
 	return 0;
 }
 
+
+stack<string> param_stack_in, param_stack_out;
 int Parse::params_pass(string name) {
 	int type;
 	int param_num=0;
@@ -1255,8 +1270,10 @@ int Parse::params_pass(string name) {
 	}
 	if(expression(type, expname)!=0) return -1;
 	// 查表项
-	//midcode
-	middle::genmid_var_and_func("PUSH", "", name, expname);
+	
+	param_stack_in.push(expname);
+
+	//middle::genmid_var_and_func("PUSH", "", name, expname);
 
 	param_num++;
 	while (token == TK_comma)
@@ -1264,13 +1281,27 @@ int Parse::params_pass(string name) {
 		LEX_ANALYSIS::get_token();
 		expression(type, expname);
 		param_num++;
-		
-		middle::genmid_var_and_func("PUSH", "", name, expname);
+		param_stack_in.push(expname);
+		//middle::genmid_var_and_func("PUSH", "", name, expname);
 		//midcode
 	}
 	return param_num;
 }
-
+int Parse::param_push_midgen(string name,int count) {
+	string temp;
+	for (int i = 0; i < count; i++)
+	{
+		temp = param_stack_in.top();
+		param_stack_in.pop();
+		param_stack_out.push(temp);
+	}
+	while (!param_stack_out.empty()) {
+		temp = param_stack_out.top();
+		middle::genmid_var_and_func("PUSH", "", name, temp);
+		param_stack_out.pop();
+	}
+	return 0;
+}
 
 
 

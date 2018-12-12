@@ -25,3 +25,16 @@ class temp_item {
 
 };
 */
+
+
+class temp_stack 
+{
+public:	
+	string temp_name[100];
+	static int top_flag;
+
+	void reset();
+	void pushT(string name);
+	int getT_addr_inStack(string name);
+};
+

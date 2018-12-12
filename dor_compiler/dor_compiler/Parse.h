@@ -23,5 +23,6 @@ public:
 	static int condition(string label_true, string label_false);
 	static int expression(int & type, string &name);
 	static int params_pass(string name);
+	static int param_push_midgen(string name,int count);
 };
 

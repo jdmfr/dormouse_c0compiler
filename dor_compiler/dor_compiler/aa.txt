@@ -1,0 +1,41 @@
+const int _const_int_0 = +0, _const_int_1 = +00001, _const_int_2 = -00003;
+const CHAR _const_char_0 = '*', _const_char_1 = '0';
+Const int MAX
+ = 1000;
+
+int ERROR;
+int numbers_to_be_selected, amount;
+int f[1000];
+int _var_int_0, _var_int_arr_0[1];
+Int _var_int_1, _var_int_arr_1[16];
+char _var_char_0, _var_char_arr_0[1];
+char _var_char_1, _var_char_arr_1[16];
+char _char;
+
+void testArithmetic{
+    const int standard = 100, ten = 10;
+    int temp;
+    temp = --10 -+ 10 + ten * (_const_char_1 - _const_char_0) / _const_int_2 + standard / (ten + _const_int_2 - _const_int_1);
+    if(temp)
+        printf("Arithmetic Check Succeed!");
+    else{
+        printf("Arithmetic Check Failed!");
+        ERROR = 1;
+    }
+    temp = (standard + _const_int_1 * 15) / ten;
+    if(temp == 11)
+        printf("Division Check Passed!");
+    else{
+        printf("Error in Division Unit!");
+        ERROR = 1;
+    }
+
+}
+
+void main() {
+    char choice;
+    int select;
+    ERROR = 0;
+    _char = '0';
+ testArithmetic;
+}

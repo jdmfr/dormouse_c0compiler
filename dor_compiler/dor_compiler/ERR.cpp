@@ -31,25 +31,26 @@ string ERR::err_msg[] = {
 	"error:: SHOULD_NEQ    ",
 	"error:: LACK_COMMA    ",
 	"error:: ILLEGAL_CHAR  "
-	//
+	"error:: main func voerflow"//main函数后还有语句
 	"error:: should be legal type "
-	//17 cant assign to a const
-	// 18  赋值类型不同
-	//19  函数调用错误
-	// 20 scanf error
-	//21 printf error
-	//22 fei fa yu ju
-	//23 非法下标
-	//24 term错误
-	//25 非法factor
-	//26 缺少参数
-	//27 插入符号表失败
-	//28参数重合
-	//29非法EXP
-	//30 only default
-	//31 case类型错误
-	//32 return 错误
-	//33 非法标识符
+	"error:: should be a comma or semicolon " // var_decl/print/func 中 ，应该是一个逗号或分号
+	"error:: can't assign to a const "//17 cant assign to a const  在赋值语句中触发
+	"error:: illegal assign type "// 18  赋值类型不同
+	"error:: call func error / params error "//19  函数调用错误
+	"error:: scanf error ,maybe scanf a const"// 20 scanf error
+	"error:: printf error ,maybe caused by exp error "//21 printf error
+	"error:: illegal statement start "//22 fei fa yu ju
+	"error:: illegal subscript "//23 非法下标
+	"error:: illegal term"//24 term错误
+	"error:: illegal factor"//25 非法factor
+	"error:: lack params " // 26 缺少参数
+	"error:: already has identity "//27 插入符号表失败
+	"error:: should be a comma or semicolon "//28参数重合
+	"error:: illegal expression "//29非法EXP
+	"error:: only have default "//30 only default
+	"error:: case type error "//31 case类型错误
+	"error:: return error "//32 return 错误
+	"error:: illegal ident "//33 非法标识符
 };
 void ERR::error(int error_num , int process_way) {
 

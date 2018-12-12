@@ -186,7 +186,7 @@ string table::get_sreg(string name) {
 string table::get_addr(string name) {
 	for (auto& it : this->entries) {
 		if (it.name == name)
-			return  to_string(it.addr) + "($fp)";
+			return  to_string(-it.addr-4) + "($fp)";  //fp位于栈顶，下面才是第一个元素
 	}
 	if (this->father != NULL)
 	{

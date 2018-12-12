@@ -1,15 +1,17 @@
 #include "Targetmips.h"
 #include <algorithm>    
-#define  RESERVED_SIZE 96 
-
+#define  RESERVED_SIZE 88
+#define TARGET_DEBUG 1
 table* cur_mips_table;
 table* call_table;
 
-bool mipsT[10] = { false };
+bool mipsT[10] = { false }; //用于标记临时寄存器是否被使用
 int RefWeight = 1;
 int mid_line_count = 0;
 int param_ptr=0;
 string funcname;
+
+int cur_func_tbz;
 
 string opcode="";
 string mid_a="";
@@ -23,8 +25,8 @@ string regs[] = { "$0", "$1", "$v0" , "$v1","$a0","$a1" ,"$a2" ,"$a3" ,"$t0" ,"$
 map <string, string >calop;  //加减乘除对应运算
 map <int, string >Tpool;
 
-
-
+temp_stack tp_stack;
+int  temp_stack::top_flag = 0 ;
 
 
 int reset_Regpool() {
@@ -69,18 +71,50 @@ bool is_temp(string mid_element) {
 	return mid_element =="0" ||(mid_element[0] == '@')||mid_element=="$RET" ;
 }
 
+//temp_stack tp_stack;
 
+
+
+void storeT_intoStack(string name) {
+	string store_T;
+	for (auto &it : Tpool) {
+		if (it.second == name)
+			store_T= "$t" + to_string(it.first);
+	}
+
+	tp_stack.pushT(name);
+	mips_output << "addi $sp,$sp, -4" << endl;
+	mips_output << "sw " << store_T << ", 0($sp) " << endl;
+	
+	return;
+
+}
 string askT_R(string name ) {
 	static int ask_flag = 0;
+	int location;
+	
+	if (ask_flag == 10)
+		ask_flag = 0;
+	
 	for (int i = 0; i < 10; i++) if (!mipsT[i]) { mipsT[i] = true; Tpool[ask_flag] = name; return "$t" + to_string((ask_flag++)%10) ; }
 
-	
+
+
+	storeT_intoStack(Tpool[ask_flag % 10]);
+	if ((location=tp_stack.getT_addr_inStack(name)) != -1) {
+		mips_output << "lw " << "$t" + to_string(ask_flag%10) <<", "<<to_string(-location-4-cur_mips_table->tablesize)<<"($fp)"<< endl;//把栈中的内容读进这个寄存器
+		if (TARGET_DEBUG)
+			cout << "location :" << location << "   tablesize is:" << cur_mips_table->tablesize << "    " << endl;
+
+	}
+
+
 	Tpool[ask_flag%10] = name ;  //赋值
 	mipsT[ask_flag%10] = true;
 
 	return "$t"+to_string((ask_flag++) % 10);
-
 }
+
 string getT_R(string name) {
 	if (name == "0") return "$0";
 	if (name == "$RET")return "$v0";
@@ -91,22 +125,39 @@ string getT_R(string name) {
 	return askT_R(name);
 }
 
+
+
+
+
+
+
 void save_current() {
 	int offset = -4;
-	for (int i = 8; i < 32; i++ , offset-=4)
+	for (int i = 8; i < 32; i++ )
 	{
-		if(i != 28 && i!=29)
+		if (i != 28 && i != 29 && i != 30)
+		{
 			mips_output << "sw " << regs[i] << " , " << offset << "($sp)" << endl;
+			offset -= 4;
+		}
 	}
+	mips_output << "sw  $fp, " << offset << "($sp)" << endl;
+
+	mips_output << "addi  $sp,$sp ," << -RESERVED_SIZE << endl;
+
 	return;
 
 }
 void refresh_current() {
-	int offset = 0;
-	for (int i = 31; i >= 8 ; i--, offset += 4) {
-		if (i != 28 && i != 29)
-			mips_output << "lw " << regs[i] << " , " << offset<<"($sp)" << endl;
+	int offset = 4;
+	for (int i = 31; i >= 8 ; i--) {
+		if (i != 28 && i != 29 && i != 30)
+		{
+			mips_output << "lw " << regs[i] << " , " << offset << "($fp)" << endl;
+			offset += 4;
+		}
 	}
+	mips_output << "lw  $fp, 0($fp)" << endl;
 	return;
 
 }
@@ -181,8 +232,6 @@ void refopt() {
 		}
 
 	}
-
-
 	return;
 }
 
@@ -190,7 +239,8 @@ void refopt() {
 int Targetmips::generator(){
 	int total_midcount = midcode.size();
 	init();
-	reset_Regpool();
+
+
 	refopt();
 	cur_mips_table = table_set[0];// point to global
 	
@@ -217,7 +267,11 @@ int Targetmips::generator(){
 	mips_output << ".text" << endl;
 	mips_output << "li $gp ,0x10010000" << endl;
 	mips_output << "j main" << endl << endl << endl ;
-
+	
+	////reset
+	tp_stack.reset();
+	reset_Regpool();
+	////reset
 
 	for (mid_line_count = 0; mid_line_count < total_midcount; mid_line_count++) {
 	//	read_mid(mid_line_count);
@@ -229,9 +283,9 @@ int Targetmips::generator(){
 		if (midcode[mid_line_count].opcode == "FUNC")
 			break;
 	}
-
+	//开始进入函数
 	while (mid_line_count < total_midcount) {
-		read_mid(mid_line_count++);
+		read_mid(mid_line_count++);//每次读入一行，这里读的是第一行 func
 
 
 		for (auto &t : table_set) {
@@ -241,10 +295,10 @@ int Targetmips::generator(){
 				break;
 			}
 		}//找到符号表
-		mips_output << mid_c << ":" << endl;
-		mips_output << "subi $sp ,$sp , " << cur_mips_table->tablesize<<endl;
-		mips_output << "move $fp,$sp" << endl;
-
+		mips_output << mid_c << ":" << endl;//函数标签
+		
+		mips_output << "add $fp,$sp,$0 " << endl;  //!!!!fp0 是第一个参数
+		mips_output << "addi $sp ,$sp , -" << cur_mips_table->tablesize << endl;
 	//	mips_output << funcname << "move $fp,$sp" << endl;
 	//	mips_output << "add  $sp , $sp ,-" << cur_mips_table->tablesize<<endl;
 		for (int i = 0; i < (int) cur_mips_table->entries.size(); i++) {
@@ -255,14 +309,19 @@ int Targetmips::generator(){
 				if (cur_mips_table->find_sreg(name))
 					mips_output << "lw " << cur_mips_table->get_sreg(name) << " , " << cur_mips_table->get_addr(name) << endl;
 			}
-		}
+		}//先读取参数到寄存器中
 		while ( mid_line_count < total_midcount) {
 			read_mid(mid_line_count++);  //readline
 			if (opcode == "FUNC") {
 				mid_line_count--;
-				break;
-			}
+				/////reset
+				tp_stack.reset();
+				reset_Regpool();
+				/////reset
+				break;//读到另一个函数的开始，退出
 
+			}
+			//如果是运算符
 			if (is_cal(opcode))// + - * /
 			{
 				string reg1,reg2,reg3;
@@ -271,7 +330,7 @@ int Targetmips::generator(){
 				else if ( is_imm(mid_a) ) {
 					reg1 = "$a3";
 					mips_output << "li   $a3 ,  " << mid_a << endl;
-				}
+				}//如果是立即数
 				else if (cur_mips_table->find_sreg(mid_a)) {
 					reg1 = cur_mips_table->get_sreg(mid_a) ;
 				}
@@ -365,7 +424,6 @@ int Targetmips::generator(){
 				if (flag)
 				{
 					mips_output << "sw  "<<reg3<< " , " << cur_mips_table->get_addr(mid_c) << endl;
-
 				}
 			}
 			//no problem
@@ -504,6 +562,7 @@ int Targetmips::generator(){
 				}
 				else {
 					mips_output << "lw $a2 , " << cur_mips_table->get_addr(mid_b) << endl;
+					mips_output << "sll $a2, $a2, 2" << endl;
 					mips_output << "add $a3,$a3,$a2" << endl;
 				}
 				//b is temp or sreg or imm or global&local 
@@ -523,6 +582,7 @@ int Targetmips::generator(){
 				}
 				else {
 					mips_output << "lw $a2," << cur_mips_table->get_addr(mid_a) << endl;
+					
 					mips_output << "sw $a2,0($a3)" << endl;
 				}
 			}
@@ -537,14 +597,17 @@ int Targetmips::generator(){
 					{
 						mips_output << "move $v0 ," << cur_mips_table->get_sreg(mid_c) << endl;
 					}
-					else if (1);
+					else if (is_temp(mid_c))
+					{
+						mips_output<<"move $v0, "<<getT_R(mid_c)<<endl;
+					}
 					else {
-						mips_output << "lw $v0 , " << cur_mips_table->get_sreg(mid_c) << endl;
+						mips_output << "lw $v0 , " << cur_mips_table->get_addr(mid_c) << endl;
 					}
 				}
 				if (cur_mips_table->name != "main")
 				{
-					mips_output << "addi $sp,$sp," << cur_mips_table->tablesize << endl;
+					mips_output <<"addi $sp , $fp ,88" << endl;
 					mips_output << "jr $ra" << endl;
 				}
 				else {
@@ -600,16 +663,18 @@ int Targetmips::generator(){
 				}
 				args_count = call_table->func_params_count;
 				stack_size = call_table->tablesize;
+			/*
 				for (int i = args_count ; i > 0; i -- )
 				{
 					mips_output << "lw  $a3 , " << -i * 4 << "($sp)" << endl;
 					mips_output << "sw  $a3 , " << -RESERVED_SIZE + i * 4 - table::get_tbs(mid_c) -4 << "($sp)" << endl;
 				}
+			*/
 				save_current();
-				mips_output << "subi  $sp,$sp ," << RESERVED_SIZE << endl;
+				
 				mips_output << " jal " << mid_c << endl;
 				refresh_current();
-				mips_output << "addi $sp,$sp , " << RESERVED_SIZE << endl;
+				
 
 				param_ptr = 0;//important
 
@@ -635,14 +700,14 @@ int Targetmips::generator(){
 					mips_output << "lw $a3 , " << cur_mips_table->get_addr(mid_c) << endl;
 				}
 				param_ptr -= 4;//		
-				mips_output<<"sw "<<reg3<<" , "<< to_string( param_ptr ) + "($sp)" << endl;
+				mips_output<<"sw "<<reg3<<" , "<< to_string( param_ptr-RESERVED_SIZE ) + "($sp)" << endl;
 				
 					
 			}
 			
 		}
 		
-		mips_output << "add $sp, $sp, " << cur_mips_table->tablesize << endl;
+		mips_output << "addi $sp , $fp ,88" << endl;
 		if (cur_mips_table->name == "main") {//函数结束
 			mips_output << "li $v0 ,10" << endl << "syscall" << endl;
 		}
@@ -653,4 +718,24 @@ int Targetmips::generator(){
 	}
 	
 	return 0;
+}
+
+
+void temp_stack::pushT(string name)
+{
+	this->temp_name[this->top_flag++] = name;
+	return;
+}
+void temp_stack::reset()
+{
+	this->top_flag = 0;
+	return;
+}
+int temp_stack::getT_addr_inStack(string name)
+{
+	for (int i = 0; i < this->top_flag; i++) {
+		if (temp_name[i] == name)
+			return  i*4 ;
+	}
+	return -1;
 }

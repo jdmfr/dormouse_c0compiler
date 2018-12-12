@@ -1,0 +1,127 @@
+int  sqrt()
+paraint  x
+@dor0  =  x  *  x
+RET      @dor0
+void  arrange()
+paraint  unuse0
+paraint  unuse1
+paraint  unuse2
+paraint  unuse3
+paraint  level
+VAR  int    i
+i = 0
+if ( level  bne  n ) label.0
+RET      
+GOTO      label.1
+label.0:
+label.1:
+label.2:
+@dor1  =  mark[i]
+if ( @dor1  bne  0 ) label.3
+mark[i]  =  1
+data[level]  =  i
+@dor2  =  level  +  1
+push    0
+push    0
+push    0
+push    0
+push    @dor2
+CALL      arrange
+mark[i]  =  0
+GOTO      label.4
+label.3:
+label.4:
+@dor3  =  i  +  1
+i = @dor3
+if ( i  blt  n ) label.2
+void  foo_recursion()
+VAR  int    _i
+_i = 0
+PRTS      $string0
+SCFI      n
+label.5:
+mark[_i]  =  0
+@dor4  =  _i  +  1
+_i = @dor4
+if ( _i  blt  n ) label.5
+push    1
+push    2
+push    3
+push    4
+push    0
+CALL      arrange
+PRTS      $string1
+int  foo_expr()
+VAR  int    a
+VAR  int    c
+VAR  int    d
+VAR  int    i
+i = 0
+PRTS      $string2
+SCFI      a
+SCFI      c
+SCFI      d
+label.6:
+data[i]  =  i
+@dor5  =  i  +  1
+i = @dor5
+if ( i  blt  scale ) label.6
+@dor6  =  data[c]
+@dor7  =  a  *  @dor6
+@dor8  =  0  -  @dor7
+@dor9  =  -2  *  99
+@dor10  =  @dor8  +  @dor9
+push    d
+CALL      sqrt
+@dor11 = $RET
+@dor12  =  @dor10  +  @dor11
+@dor13  =  5  /  2
+@dor14  =  @dor13  *  1
+@dor15  =  @dor12  -  @dor14
+RET      @dor15
+void  do_nothing()
+void  value()
+VAR  int    op
+SCFI      op
+bne  op  1  label.8
+PRTI      test
+GOTO      label.7
+label.8:
+bne  op  2  label.9
+PRTC      98
+GOTO      label.7
+label.9:
+PRTC      98
+label.7:
+void  main()
+VAR  char    op
+SCFC      op
+label.10:
+@dor16  =  0  -  1
+beq  @dor16  0  label.11
+bne  op  101  label.13
+CALL      foo_expr
+@dor17 = $RET
+PRTI      @dor17
+GOTO      label.12
+label.13:
+bne  op  114  label.14
+CALL      foo_recursion
+GOTO      label.12
+label.14:
+bne  op  110  label.15
+CALL      do_nothing
+GOTO      label.12
+label.15:
+bne  op  118  label.16
+CALL      value
+GOTO      label.12
+label.16:
+PRTS      $string3
+PRTC      op
+label.12:
+GOTO      label.17
+label.11:
+label.17:
+bne  0  0  label.10
+RET      

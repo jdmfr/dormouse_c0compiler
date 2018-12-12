@@ -1,0 +1,147 @@
+CONST  int  scale  100
+CONST  int  test  20
+CONST  char  char_test  121
+ARRAY  int  mark  100
+ARRAY  int  data  100
+VAR  int    a
+VAR  int    b
+VAR  int    c
+VAR  int    d
+VAR  int    e
+VAR  int    n
+FUNC  int    sqrt
+PARA  int    x
+*  x  x  @dor0
+RET      @dor0
+FUNC  void    arrange
+PARA  int    unuse0
+PARA  int    unuse1
+PARA  int    unuse2
+PARA  int    unuse3
+PARA  int    level
+VAR  int    i
+=  0    i
+bne  level  n  label.0
+RET      
+GOTO      label.1
+label.0:
+label.1:
+LOOP      
+label.2:
+=[]  mark  i  @dor1
+bne  @dor1  0  label.3
+[]=  1  i  mark
+[]=  i  level  data
++  level  1  @dor2
+PUSH    arrange  0
+PUSH    arrange  0
+PUSH    arrange  0
+PUSH    arrange  0
+PUSH    arrange  @dor2
+CALL      arrange
+[]=  0  i  mark
+GOTO      label.4
+label.3:
+label.4:
++  i  1  @dor3
+=  @dor3    i
+blt  i  n  label.2
+LOOPEND      
+FUNC  void    foo_recursion
+VAR  int    _i
+=  0    _i
+PRTS      $string0
+SCFI      n
+LOOP      
+label.5:
+[]=  0  _i  mark
++  _i  1  @dor4
+=  @dor4    _i
+blt  _i  n  label.5
+LOOPEND      
+PUSH    arrange  1
+PUSH    arrange  2
+PUSH    arrange  3
+PUSH    arrange  4
+PUSH    arrange  0
+CALL      arrange
+PRTS      $string1
+FUNC  int    foo_expr
+VAR  int    a
+VAR  int    c
+VAR  int    d
+VAR  int    i
+=  0    i
+PRTS      $string2
+SCFI      a
+SCFI      c
+SCFI      d
+LOOP      
+label.6:
+[]=  i  i  data
++  i  1  @dor5
+=  @dor5    i
+blt  i  scale  label.6
+LOOPEND      
+=[]  data  c  @dor6
+*  a  @dor6  @dor7
+-  0  @dor7  @dor8
+*  -2  99  @dor9
++  @dor8  @dor9  @dor10
+PUSH    sqrt  d
+CALL      sqrt
+=  $RET    @dor11
++  @dor10  @dor11  @dor12
+/  5  2  @dor13
+*  @dor13  1  @dor14
+-  @dor12  @dor14  @dor15
+RET      @dor15
+FUNC  void    do_nothing
+FUNC  void    value
+CONST  int  test  110
+VAR  int    op
+SCFI      op
+bne  op  1  label.8
+PRTI      test
+GOTO      label.7
+label.8:
+bne  op  2  label.9
+PRTC      98
+GOTO      label.7
+label.9:
+PRTC      98
+label.7:
+FUNC  void    main
+VAR  char    op
+SCFC      op
+LOOP      
+label.10:
+-  0  1  @dor16
+beq  @dor16  0  label.11
+bne  op  101  label.13
+CALL      foo_expr
+=  $RET    @dor17
+PRTI      @dor17
+GOTO      label.12
+label.13:
+bne  op  114  label.14
+CALL      foo_recursion
+GOTO      label.12
+label.14:
+bne  op  110  label.15
+CALL      do_nothing
+GOTO      label.12
+label.15:
+bne  op  118  label.16
+CALL      value
+GOTO      label.12
+label.16:
+PRTS      $string3
+PRTC      op
+label.12:
+GOTO      label.17
+label.11:
+label.17:
+bne  0  0  label.10
+LOOPEND      
+RET      
