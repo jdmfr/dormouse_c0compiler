@@ -50,7 +50,11 @@ void LEX_ANALYSIS::get_token(){
 	{
 		cout << "1!!!!!!" << endl;
 	}
-	
+	if (should_back_token)
+	{
+		should_back_token = false;
+		return;
+	}
     while(ch==' '||ch=='\t'||ch=='\n' )
     {
         getch();
@@ -177,6 +181,7 @@ void LEX_ANALYSIS::get_token(){
         getch();
         if(isalpha(ch)||isdigit(ch)||ch=='+'||ch=='-'||ch=='*'||ch=='/'||ch=='_')
         {
+
             sym+= ch;
 			LEX_ANALYSIS::sym_num = (int)ch;
             getch();
@@ -184,7 +189,8 @@ void LEX_ANALYSIS::get_token(){
 		else
 		{
 			ERR::error(ILLEGAL_CHAR, 0);
-			sym=" ";
+			sym=ch;
+			LEX_ANALYSIS::sym_num = (int)ch;
 			getch();
 		}
 		token = TK_cchar;
@@ -206,6 +212,8 @@ void LEX_ANALYSIS::get_token(){
         getch();
         while(ch==32||ch==33||(ch>=35&&ch<=126))
         {
+			if (ch == '\\')
+				sym += ch;
             sym+=ch;
 			getch();
         }

@@ -5,7 +5,7 @@
 #include "middle.h"
 #include "string"
 #include "stack"
-#define PARSE_DEBUG 1
+#define PARSE_DEBUG 0
 
 string type2str[4] = { "","void","int","char" };
 char i_swap_s[10] = { 0 };
@@ -16,7 +16,8 @@ string opposite_op(string op) {
 	if (op == ">")return "ble";
 	if (op == "<=")return "bgt";
 	if (op == ">=")return "blt";
-}
+	return "bne";
+}//取得相反的比较符，用于转移生成
 string op2str(string op) {
 	if (op == "==") return "beq";
 	if (op == "!=")return "bne";
@@ -24,13 +25,16 @@ string op2str(string op) {
 	if (op == ">")return "bgt";
 	if (op == "<=")return "ble";
 	if (op == ">=")return "bge";
-}
+	return "beq";
+}//取得对应比较符
 
 int check(int tk ) {
 	if (token == tk)
 		return 0;
 	else {
-		ERR::error(tk);
+		ERR::error(34);
+		should_back_token = true;
+		cout << "\t\t 你缺少符号 " << "\" " << LEX_PRINT_KEYS[tk] << " \"" << endl;
 		return -1;
 	}
 }
@@ -41,6 +45,7 @@ int skip_until(int tk) {
 		if (token == tk)
 			break;
 	}
+	should_back_token = false;
 	return 0;
 }
 string newlabel() {
@@ -49,28 +54,35 @@ string newlabel() {
 }
 string new_local_t() {
 	static int b = 0;
-	return "@dor" + to_string(b++);
+	string name = "@dor"+to_string(b++);
+	//变动态栈为静态 12.20
+	cur_table->temp_set.push_back(name);
+	//
+	return name  ;
 }
 int len = 0;
 int err_count;
 int already_main = 0;
 int Parse::program() {
 	
-	string g_cur_name = "$global";
+	string g_cur_name = "$global";    //全局符号表域名: $global
 	cur_table = new table( g_cur_name);
 	table_set.push_back(cur_table);
 
 
 
-	LEX_ANALYSIS::get_token();
+	LEX_ANALYSIS::get_token();  //全局第一个字符
 
 	while(token == KW_const)
 		const_decl();
 	while((token == KW_char || token == KW_int || token == KW_void)&& !already_main)
 		var_function_decide_decl();
 	
-	if (token != TK_eof)
-		ERR::error(14);//voerflow main
+	if (token != TK_eof)//voerflow main
+		ERR::error(14);
+	if (already_main == 0)//check main
+		ERR::error(35);
+
 
 	if (PARSE_DEBUG)
 		cout << "this is a program" << endl;
@@ -89,10 +101,19 @@ int Parse::var_function_decide_decl() {             //var 或者func  都是全局的
 		LEX_ANALYSIS::get_token();
 		check(TK_ident);
 		name = sym;
-
+		if (name == "main")
+		{
+			ERR::error(35);
+			LEX_ANALYSIS::get_token();
+			goto FACT_MAIN;
+		}
 		LEX_ANALYSIS::get_token();
-		if (token == TK_lparen ||token == TK_lbrace ) {
+		if (token == TK_lparen ||token == TK_lbrace ) {  
 			func_decl(type, name);
+			if (name == "main")
+			{
+				ERR::error(35);
+			}
 			if (PARSE_DEBUG)
 				cout << "this is a func declare " << endl;
 			LEX_ANALYSIS::get_token();
@@ -121,7 +142,7 @@ int Parse::var_function_decide_decl() {             //var 或者func  都是全局的
 					
 				itoa(len, i_swap_s ,10);
 				middle::genmid_var_and_func("ARRAY", type2str[type],  name, i_swap_s );   ///gen mid code
-
+			
 
 				LEX_ANALYSIS::get_token();
 				if (token == TK_comma || token == TK_semicolon)
@@ -138,7 +159,7 @@ int Parse::var_function_decide_decl() {             //var 或者func  都是全局的
 					}
 				}
 				else {
-					error_count++;
+					ERR::error(34);
 					skip_until(TK_semicolon);
 					LEX_ANALYSIS::get_token();
 					return -1;
@@ -163,21 +184,24 @@ int Parse::var_function_decide_decl() {             //var 或者func  都是全局的
 			}
 			else if (token == TK_semicolon)
 			{
-				if (cur_table->insert_var(name, type) != 0) ERR::error(27);
+				if (cur_table->insert_var(name, type) != 0) ERR::error(34);
 				middle::genmid_var_and_func("VAR", type2str[type], "", name);   ///gen mid code 
 
 				break;
 			}
-
+			else {
+				ERR::error(34);
+				break;
+			}
 
 		}
 	}
 	else if (token == KW_void)
 	{
 		LEX_ANALYSIS::get_token();
-		if (token != TK_ident &&token!= KW_main) {
+		if (token != TK_ident &&token!= KW_main) {//函数名
 			ERR::error(33, 0);
-			skip_until(TK_semicolon);
+			skip_until(TK_rbrace);
 			LEX_ANALYSIS::get_token();
 			return -1;
 		}
@@ -186,7 +210,8 @@ int Parse::var_function_decide_decl() {             //var 或者func  都是全局的
 			func_decl(type, sym);    //type::void类型 sym::函数名
 			LEX_ANALYSIS::get_token();
 		}
-		else {
+		else {//main函数
+FACT_MAIN:
 			LEX_ANALYSIS::get_token();
 			check(TK_lparen);
 			LEX_ANALYSIS::get_token();
@@ -200,6 +225,9 @@ int Parse::var_function_decide_decl() {             //var 或者func  都是全局的
 		if (PARSE_DEBUG)
 			cout << "this is a func declare " << endl;
 		return 0;
+	}
+	else {
+		ERR::error(34);
 	}
 	LEX_ANALYSIS::get_token();
 
@@ -217,8 +245,6 @@ int Parse::func_decl(int type, string funcname) {
 	if (cur_table->insert_function(funcname, FUNC, new_table, funcname == "main") != 0)
 	{
 		ERR::error(27);
-		skip_until(TK_lbrace);
-		return -1;
 	}
 
 
@@ -230,7 +256,10 @@ int Parse::func_decl(int type, string funcname) {
 	//LEX_ANALYSIS::get_token();上一阶段已经做过了，现在是 { 或者 (
 	if (token==TK_lparen) {
 		LEX_ANALYSIS::get_token();
-		if (token == TK_rparen) ERR::error(14); //不能把有参数的没参数的弄混
+		if (token == TK_rparen) {
+			ERR::error(38); //不能把有参数的没参数的弄混
+			skip_until(TK_lbrace);
+		}
 		else while (1)
 		{
 			if (token == KW_int || token == KW_char)
@@ -260,8 +289,7 @@ int Parse::func_decl(int type, string funcname) {
 			}
 			if (token != TK_comma) {
 				ERR::error(16, 1); //
-				skip_until(TK_rparen);
-				LEX_ANALYSIS::get_token();
+				skip_until(TK_lbrace);
 				break;
 			}
 			else
@@ -284,11 +312,23 @@ int Parse::func_decl(int type, string funcname) {
 
 	check(TK_lbrace);
 	LEX_ANALYSIS::get_token();
-
+/*	if (token != KW_const && token != KW_int && token != KW_char && token!=KW_void)
+	{
+		ERR::error(15);
+		skip_until(TK_semicolon);
+		LEX_ANALYSIS::get_token();
+		
+	}*/
 	while (token == KW_const)
 	{
 		const_decl();
 	}
+/*	while (token != KW_int && token != KW_char)
+	{
+		ERR::error(15);
+		skip_until(TK_semicolon);
+		LEX_ANALYSIS::get_token();
+	}*/
 	while (token == KW_int || token == KW_char)
 	{
 		var_decl();
@@ -296,9 +336,11 @@ int Parse::func_decl(int type, string funcname) {
 	while (token != TK_rbrace) {
 		statement();
 	}
-
+	//12.20 添加静态栈大小
+	cur_table->stacksize = (int)cur_table->temp_set.size() * 4;
+	//
 	check(TK_rbrace);
-	cur_table = cur_table->father;
+	cur_table = cur_table->father;//切回到全局函数
 	return 0;
 }
 
@@ -324,7 +366,15 @@ int Parse::const_decl()
 				flag = (token == TK_plus) ? 1 : -1;
 				LEX_ANALYSIS::get_token();
 			}
-			check(TK_num);
+			if (token!=TK_num)
+			{
+				if (token == TK_cchar)
+					ERR::error(37);  //容错判断，出现了给int型常量赋char情况
+				else ERR::error(34);
+				skip_until(TK_semicolon);
+				LEX_ANALYSIS::get_token();
+				return -1;
+			}
 			value = LEX_ANALYSIS::sym_num;
 			value = value * flag;
 			if (cur_table->insert_const(name, type, value) != 0)
@@ -349,7 +399,7 @@ int Parse::const_decl()
 				LEX_ANALYSIS::get_token();
 				break;
 			}
-			else { ERR::error(5); return -1; }
+			else { ERR::error(5); skip_until(TK_semicolon); return -1; }
 		}
 	}
 	else if (token == KW_char)
@@ -492,6 +542,12 @@ int Parse::const_sea(int &type, int &result) {
 		LEX_ANALYSIS::get_token();
 		return 0;
 	}
+	else if (cur_table->is_const(sym)) {
+		result = cur_table->get_et(sym).value;
+		type = cur_table->get_type(sym);
+		LEX_ANALYSIS::get_token();
+		return 0;
+	}
 	else return -1;
 }
 
@@ -533,7 +589,9 @@ int Parse::statement() {
 
 		}
 		else{ 
-			
+			skip_until(TK_semicolon);
+			LEX_ANALYSIS::get_token();
+			return -1;
 			//local_repair
 			;//midcode label2
 		}
@@ -566,7 +624,7 @@ int Parse::statement() {
 	else if (token == TK_lbrace) //语句列
 	{
 		LEX_ANALYSIS::get_token();
-		statement();
+	//	statement();
 		while (token !=TK_rbrace)
 			statement();
 		LEX_ANALYSIS::get_token();
@@ -584,14 +642,17 @@ int Parse::statement() {
 		check(TK_lparen);
 		LEX_ANALYSIS::get_token();
 		if (expression(type, result)!=0) {
-			ERR::error(29, 0); skip_until(TK_lbrace); LEX_ANALYSIS::get_token(); return -1;
+			ERR::error(29, 0); 
+			skip_until(TK_rparen); 
+			//LEX_ANALYSIS::get_token(); 
+			//return -1;
 		}
 
 		check(TK_rparen);
 		LEX_ANALYSIS::get_token();
 		check(TK_lbrace);
 		LEX_ANALYSIS::get_token();
-		
+		vector<int>  case_stack;
 		{
 			string name;
 			int const_value;
@@ -605,7 +666,9 @@ int Parse::statement() {
 			check(KW_case);
 			LEX_ANALYSIS::get_token();
 			
-			const_sea(const_type, const_value);
+			if(const_sea(const_type, const_value)!=0)
+				ERR::error(41);
+			case_stack.push_back(const_value);
 			//midcode
 			if(const_type != type)
 			{ ERR::error(31, 0); 
@@ -633,10 +696,23 @@ int Parse::statement() {
 			{
 				LEX_ANALYSIS::get_token();
 
-				const_sea(const_type, const_value);
+				if (const_sea(const_type, const_value)!=0)
+					ERR::error(41);
 				//midcode
 				if (const_type != type) { ERR::error(31, 0); skip_until(TK_rbrace); LEX_ANALYSIS::get_token(); return -1; }
 				else {
+					bool flag = false;
+					for (auto &i : case_stack) {
+						if (const_value == i)
+						{
+							flag = true;
+							break;
+						}
+					}
+					if (flag) {
+						ERR::error(36);
+					}
+					case_stack.push_back(const_value);// push stack to check same case 
 					label_case = newlabel();
 					itoa(const_value, i_swap_s, 10);
 					middle::genmid("bne", result, i_swap_s, label_case);
@@ -705,8 +781,11 @@ int Parse::statement() {
 				string expname;
 				expression(type, expname);
 				//midcode
-
-				middle::genmid("=", expname, "", name);
+				if (type != cur_table->get_type(name)) {
+					ERR::error(18, 0);
+				}
+				else
+					middle::genmid("=", expname, "", name);
 
 			}
 		}
@@ -715,8 +794,17 @@ int Parse::statement() {
 			string subscript;
 			check(TK_lbrack);
 			LEX_ANALYSIS::get_token();
-			if (expression(type, subscript) == 0){
+			if (expression(type, subscript) == 0){ ///TODO:array  if type is num
 				string expname;
+				///add at 12.17
+				if ((subscript[0] >= '0'&&subscript[0] <= '9') || subscript[0] == '-') {
+
+					if (cur_table->get_et(name).value <= atoi(subscript.data()) || atoi(subscript.data()) < 0)
+						ERR::error(23);
+				}
+
+
+				///end
 				check(TK_rbrack);
 				LEX_ANALYSIS::get_token();
 				check(TK_assign);
@@ -781,6 +869,10 @@ int Parse::statement() {
 				LEX_ANALYSIS::get_token();
 			}
 			
+		}
+		else {
+			ERR::error(33);
+			skip_until(TK_semicolon);
 		}
 		if (check(TK_semicolon) != 0)
 			skip_until(TK_semicolon);
@@ -975,6 +1067,7 @@ int Parse::statement() {
 
 int Parse::condition(string true_label, string false_label) {
 	int type;
+	int type2;
 	string op;
 	string expname1;
 	string expname2;
@@ -984,6 +1077,8 @@ int Parse::condition(string true_label, string false_label) {
 		skip_until(TK_rparen);
 		return  -1;
 	}
+	if (type != KW_int)
+		ERR::error(39);
 
 	if (LEX_ANALYSIS::is_compop(token))// daiding  gaicheng yunsuanfu
 	{
@@ -991,13 +1086,16 @@ int Parse::condition(string true_label, string false_label) {
 		op_op = opposite_op(sym);
 
 		LEX_ANALYSIS::get_token();
-		if (expression(type, expname2) != 0)
+		if (expression(type2, expname2) != 0)
 		{
 			skip_until(TK_rparen);
 			//这里没有LEX_ANALYSIS::get_token();
 
 			return  -1;
 		}
+		if (type2 != KW_int)
+			ERR::error(39);
+
 		if (true_label != "")
 			middle::genmid_comp(op,expname1,expname2,true_label); // midcode
 		else
@@ -1027,18 +1125,30 @@ int Parse::expression(int &type, string &result) {
 			LEX_ANALYSIS::get_token();
 			if (term(type, term1) != 0) 
 				return -1;
+
 			if (term1 != "")
+				result = term1;
+	/*		if (term1 != "")
 			{
 				result = new_local_t();
 				middle::genmid_cal("+",term1,"0",result) ;//midcode
-			}
+			}*/
 		}
 		else if (token == TK_minus)
 		{
 			LEX_ANALYSIS::get_token();
 			if (term(type, term1) != 0)
 				return -1;
-			if (term1 != "")
+			if (term1[0] == '-' || isdigit(term1[0]))
+			{
+				if (term1[0] == '-')
+				{
+					term1 = term1.substr(1, term1.length());
+				}
+				else term1 = "-" + term1;
+				result = term1;
+			}
+			else if (term1 != "")
 			{
 				result = new_local_t();
 				middle::genmid_cal("-","0",term1, result);
@@ -1140,6 +1250,11 @@ int Parse::factor(int &type, string &result) {
 			}
 			offset = LEX_ANALYSIS::sym_num;  //这里稍微有问题
 
+			if ((subscript[0] >= '0' &&subscript[0]<='9')||subscript[0]=='-') {
+
+				if (cur_table->get_et(name).value <= atoi(subscript.data()) || atoi(subscript.data()) < 0)
+					ERR::error(23);
+			}
 			/*如果数组溢出,要报错*/
 			/*if (offset >= (cur_table->get_et(name)).value)
 			{
@@ -1156,10 +1271,16 @@ int Parse::factor(int &type, string &result) {
 			check(TK_rbrack);
 			LEX_ANALYSIS::get_token();
 		}
-		else if (cur_table->is_var(name)|| cur_table->is_const(name))//is_var
+		else if (cur_table->is_var(name))//is_var
 		{
 			type = cur_table->get_type(name);
 			result = name;
+			LEX_ANALYSIS::get_token();
+		}
+		else if (cur_table->is_const(name))  //add at 12.18对于常数直接取值，用于表达式的计算
+		{	
+			type = cur_table->get_type(name);
+			result = to_string(cur_table->get_et(name).value);
 			LEX_ANALYSIS::get_token();
 		}
 		else if(cur_table->is_func(name)) // is_func
@@ -1198,18 +1319,25 @@ int Parse::factor(int &type, string &result) {
 				//这里千万注意别重复读下一个字符
 
 			}
+		
 			//midcode callfunc
 			//assign
 
 			middle::genmid("CALL", "", "", func_t->name);
 			result = new_local_t();
 			middle::genmid("=", "$RET", "", result);
-			
+			if (type == KW_void)
+			{
+				ERR::error(40);
+				skip_until(TK_semicolon);
+				//LEX_ANALYSIS::get_token();
+				return -1;
+			}
 		}
 		else
 		{
-			ERR::error(24);
-			skip_until(TK_semicolon);
+			ERR::error(33);
+		//	skip_until(TK_semicolon);
 			//LEX_ANALYSIS::get_token();
 			return -1;
 		}
@@ -1234,8 +1362,11 @@ int Parse::factor(int &type, string &result) {
 	}
 	else if (token == TK_lparen) {
 		LEX_ANALYSIS::get_token();
-		if (expression(type, result) != 0) 
-		
+		if (expression(type, result) != 0) {
+			;
+		}
+
+		type = KW_int;
 		check(TK_rparen);
 		LEX_ANALYSIS::get_token();
 

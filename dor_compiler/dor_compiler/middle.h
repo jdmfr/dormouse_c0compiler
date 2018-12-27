@@ -9,7 +9,7 @@ public:
 	string b_op;
 	string c_op;
 
-
+	middle();
 	middle(string opcode, string a,string b, string c);
 	~middle();
 
@@ -23,3 +23,4 @@ public:
 
 
 extern vector<middle> midcode;
+extern vector<middle> midcode_after;

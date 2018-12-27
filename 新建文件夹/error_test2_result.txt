@@ -1,0 +1,13 @@
+input your test.txt ：
+error_test2.txt
+error:: illegal ident 未定义标识符      before 1:12
+error:: 标识符/符号错误，请检查代码 -------       before 7:9
+                 你缺少符号 " IDENT "
+error:: there is no main function or wrong main func ,please edit your file      before 7:9
+error:: should be legal type      before 8:10
+error:: ILLEGAL_CHAR       before 12:9
+error:: illegal assign type      before 15:1
+error:: illegal assign type      before 16:1
+error:: 左右表达式类型不同      before 17:1
+error:: 标识符/符号错误，请检查代码 -------       before 20:8
+                 你缺少符号 " ELSE "

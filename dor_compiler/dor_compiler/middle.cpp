@@ -2,11 +2,12 @@
 #include "signtable.h"
 #include<cstring>
 #define MIDCODE_DEBUG  1
-#define REAL_MID_OUTPUT
+#undef REAL_MID_OUTPUT
 vector<middle> midcode;
+vector<middle> midcode_after;
 
 
-
+middle::middle(){}
 
 middle::middle(string opcode, string a, string b, string c)
 {

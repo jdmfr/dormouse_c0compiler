@@ -37,6 +37,7 @@ table::table(string name) {
 	this->tablesize = 0;
 	this->func_params_count = 0;
 	this->func_tag = false;
+	this->father = NULL;
 }
 table::table(string name, int type, table* father, bool is_main) {
 	this->name = name;
@@ -93,17 +94,19 @@ int table::insert_array(string name, int type, int length) {
 }
 
 int table::get_type(string name) {
-	for (auto& i : this->entries)
-		if (i.name == name)
-			return i.type;
+	if (!this->entries.empty())
+		for (auto& i : this->entries)
+			if (i.name == name)
+				return i.type;
 	if (this->father != NULL)
 		return father->get_type(name);
 	else return -1;
 }
 table_entry table::get_et(string name) {
-	for (auto& i : this->entries)
-		if (i.name == name)
-			return i;
+	if (!this->entries.empty())
+		for (auto& i : this->entries)
+			if (i.name == name)
+				return i;
 	if (this->father != NULL)
 		return father->get_et(name);
 	else return table_entry();
@@ -111,10 +114,11 @@ table_entry table::get_et(string name) {
 
 
 bool table::is_const(string name) {
-	for(auto& i : this->entries)
-		if (i.name == name) {
-			return (i.kind == CONST) ? true : false;
-		}
+	if (!this->entries.empty())
+		for(auto& i : this->entries)
+			if (i.name == name) {
+				return (i.kind == CONST) ? true : false;
+			}
 	if (this->father != NULL)
 		return father->is_const(name);
 	else return false;
@@ -122,28 +126,31 @@ bool table::is_const(string name) {
 
 bool table::is_array(string name)
 {
-	for (auto& i : this->entries)
-		if (i.name == name) {
-			return (i.kind == ARR) ? true : false;
-		}
+	if(!this->entries.empty())
+		for (auto& i : this->entries)
+			if (i.name == name) {
+				return (i.kind == ARR) ? true : false;
+			}
 	if (this->father != NULL)
 		return father->is_array(name);
 	else return false;
 }
 bool table::is_func(string name) {
-	for (auto& i : this->entries)
-		if (i.name == name) {
-			return (i.kind == FUNC) ? true : false;
-		}
+	if (!this->entries.empty())
+		for (auto& i : this->entries)
+			if (i.name == name) {
+				return (i.kind == FUNC) ? true : false;
+			}
 	if (this->father != NULL)
 		return father->is_func(name);
 	else return false;
 }
 bool table::is_var(string name) {
-	for (auto& i : this->entries)
-		if (i.name == name) {
-			return (i.kind == VAR|| i.kind== PARAM) ? true : false;
-		}
+	if (!this->entries.empty())
+		for (auto& i : this->entries)
+			if (i.name == name) {
+				return (i.kind == VAR|| i.kind== PARAM) ? true : false;
+			}
 	if (this->father != NULL)
 		return father->is_var(name);
 	else return false;
@@ -184,10 +191,18 @@ string table::get_sreg(string name) {
 }
 
 string table::get_addr(string name) {
-	for (auto& it : this->entries) {
-		if (it.name == name)
-			return  to_string(-it.addr-4) + "($fp)";  //fp位于栈顶，下面才是第一个元素
+	if (name[0] == '@') {
+		for (int index = 0; index < (int)this->temp_set.size(); index++) {
+			if (temp_set[index] == name)
+				return to_string(-index * 4 - this->tablesize - 4) + "($fp)";
+		}
+		cout << "发生了临时变量在符号表中的索引错误\n" << endl;
 	}
+	else if (!this->entries.empty())
+		for (auto& it : this->entries) {
+			if (it.name == name)
+				return  to_string(-it.addr-4) + "($fp)";  //fp位于栈顶，下面才是第一个元素
+		}
 	if (this->father != NULL)
 	{
 		for (auto& it : this->father->entries)
@@ -198,7 +213,8 @@ string table::get_addr(string name) {
 	}
 	else
 	{
-		cout << "get addr_wrong" << endl;
+		error_count++;
+		cout << "error::get addr_wrong" << endl;
 		getchar();
 	}
 	return "";
@@ -208,7 +224,7 @@ string table::get_addr(string name) {
 int table::get_a_offset(string name) {
 	for (auto& it : this->entries) {
 		if (it.name == name)
-			return  it.addr;
+			return  -it.addr-it.value*4 ;
 	}
 }
 

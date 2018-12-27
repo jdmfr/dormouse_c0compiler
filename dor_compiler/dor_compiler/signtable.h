@@ -12,11 +12,13 @@ public:
 	bool func_tag;
 	string name;
 	table* father;
-	vector<table_entry> entries;
 	int tablesize;
+	int stacksize;
 	int type;
 	int func_params_count;
-	
+	vector<table_entry> entries;
+	vector<string> temp_set;
+
 	table(string name);
 	table(string name,int type, table* father, bool is_main);
 
@@ -27,7 +29,7 @@ public:
 	bool is_array(string name);
 	int get_type(string name);
 	
-static 	table * get_func(string name);
+	static 	table * get_func(string name);
 
 	int insert_function(string name, int type, table* father, bool is_main);
 	int insert_const(string name, int type , int value =0);

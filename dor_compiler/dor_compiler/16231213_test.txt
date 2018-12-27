@@ -69,7 +69,7 @@ void op_test(int param_1 , char paRam_2 ){
 	l_b = ('D'-'C'-foo1) + paRam_2 ;
 	l_e[1] = param_1 ;
 	l_e[0] = l_d*25 + 3*4 /2 -5*3 +(l_d-(l_c+1))+l_b;
-	if ( l_e[0] == _g_ch_r )
+	if ( l_e[0] == _g_ch_r+0 )
 		printf("Hi_DorMouse:: op_test_passed!");
 	else ;
 
@@ -89,7 +89,7 @@ int while_switch {
        	 case 'c' : {printf("This is c !");
                    	 ch='d';}
 	default: ;
-                   }while(ch != 'd')
+                   }while((ch) != ('d'))
 
 	i = g_const_ib -1 ;
 	do 
@@ -165,11 +165,11 @@ void if_and_glo_loc_test{
 	ch1 = int_const_c + 10 ;
 
 	if ( g_const_ia == 2)
-		if(g_int_a == 'a')
-		if (g_const_ib > '2' ){
+		if((g_int_a) == ('a'))
+		if ((g_const_ib) >( '2') ){
 			if (g_const_plus < 4)
-				if ( g_const_minus >= 43)
-					if(g_const_minus <= 43)
+				if ( g_const_minus+0 >= 43)
+					if(g_const_minus+0 <= 43)
 						ch1 =ch1+6;
 					else ;
 				else{ printf("5 or 4 in if_test_wrong!!!..");}
@@ -210,7 +210,7 @@ void array_test {
 
 	_g_str_R[97]= 'a';
 
-	if (_g_str_R[97]=='a') answer=answer+3     ; else answer=answer+1024;
+	if ((_g_str_R[97])==('a')) answer=answer+3     ; else answer=answer+1024;
 	printf("array_test_part_2_ans::",answer);
 
 	return ;

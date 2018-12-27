@@ -1,0 +1,15 @@
+error:: 标识符/符号错误，请检查代码 -------       before 12:9
+                 你缺少符号 " IDENT "
+error:: should be a comma or semicolon      before 12:9
+error:: illegal subscript 非法下标/数组越界      before 14:7
+error:: 标识符/符号错误，请检查代码 -------       before 15:4
+                 你缺少符号 " lbrack "
+error:: illegal factor     before 15:4
+error:: 标识符/符号错误，请检查代码 -------       before 15:4
+                 你缺少符号 " rbrack "
+error:: illegal subscript 非法下标/数组越界      before 16:6
+error:: can't assign to a const      before 20:4
+error:: void函数不能作为表达式的项      before 22:1
+error:: lack params      before 24:11
+error:: illegal ident 未定义标识符      before 26:4
+您的程序有误，请检查

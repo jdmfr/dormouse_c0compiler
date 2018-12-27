@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Parse.h"
 #include "Targetmips.h"
+#include "optim.h"
 using namespace std;
 
 void pregroess(){
@@ -31,7 +32,6 @@ int main()
 
 	mid_output_co.open("mid_output_co.txt");
 	mid_output_real.open("mid_output_real.txt");
-	mips_output.open("mips.asm");
 
 	pregroess();
 	if (LEX_ANALYSIS::readfile() == 0)
@@ -44,10 +44,28 @@ int main()
 				break;
 		}
 */
-  	Targetmips::generator();
+
+
+	if (error_count == 0) {
+		{
+			optim::optim_labels();
+			middle::middle_real_generate();
+			optim::gen_block();
+			optim::DAG_optim();
+		}
+
+		Targetmips::generator("mips.asm");
+
+#ifdef GEN_BLOCK_INFO
+		midcode = midcode_after;
+		Targetmips::generator("mips1.asm");
+
+#endif
+	}
+	else 
+		cout << "您的程序有误，请检查" << endl;
 	mid_output_co.close();
 	mid_output_real.close();
-	mips_output.close();
 	getchar();
 	getchar();
 	return 0;

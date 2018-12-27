@@ -1,0 +1,26 @@
+int a[10];
+int akb48(){
+
+    return ;
+}
+void akb48{
+
+    return 1;
+}
+char akb48{
+
+    return 2;
+}
+void main{
+	const int a = 'b';
+	const int b =11;
+	
+	a[b]=32;
+	a[11]=32;
+	a[-1]=32;
+	a=32;
+	printf("hello",c);
+	return ;
+}
+
+a[0]=32;

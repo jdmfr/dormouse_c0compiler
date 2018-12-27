@@ -6,7 +6,7 @@
 #include<stdlib.h>
 #include<fstream>
 #include <vector>
-
+#define GEN_BLOCK_INFO
 ////////////////error/////////////
 #define LACK_QUOTE 1 
 #define LACK_DOQUOTE 2
@@ -29,5 +29,6 @@ extern int pos_num;
 extern int line_count;
 extern int line_l;
 extern int error_count;
-
+extern bool should_back_token;
 extern ofstream mid_output_co, mid_output_real, mips_output;
+bool is_comp(string name);

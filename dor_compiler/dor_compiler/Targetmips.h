@@ -6,7 +6,7 @@ class Targetmips
 public:
 	Targetmips();
 	~Targetmips();
-	static int generator();
+	static int generator(string name);
 };
 
 /*
@@ -35,6 +35,6 @@ public:
 
 	void reset();
 	void pushT(string name);
-	int getT_addr_inStack(string name);
+	bool find_inStack(string name);
 };
 

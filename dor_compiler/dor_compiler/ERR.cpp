@@ -30,32 +30,41 @@ string ERR::err_msg[] = {
 	/////---- 0~10  ----/////
 	"error:: SHOULD_NEQ    ",
 	"error:: LACK_COMMA    ",
-	"error:: ILLEGAL_CHAR  "
-	"error:: main func voerflow"//main函数后还有语句
-	"error:: should be legal type "
-	"error:: should be a comma or semicolon " // var_decl/print/func 中 ，应该是一个逗号或分号
-	"error:: can't assign to a const "//17 cant assign to a const  在赋值语句中触发
-	"error:: illegal assign type "// 18  赋值类型不同
-	"error:: call func error / params error "//19  函数调用错误
-	"error:: scanf error ,maybe scanf a const"// 20 scanf error
-	"error:: printf error ,maybe caused by exp error "//21 printf error
-	"error:: illegal statement start "//22 fei fa yu ju
-	"error:: illegal subscript "//23 非法下标
-	"error:: illegal term"//24 term错误
-	"error:: illegal factor"//25 非法factor
-	"error:: lack params " // 26 缺少参数
-	"error:: already has identity "//27 插入符号表失败
-	"error:: should be a comma or semicolon "//28参数重合
-	"error:: illegal expression "//29非法EXP
-	"error:: only have default "//30 only default
-	"error:: case type error "//31 case类型错误
-	"error:: return error "//32 return 错误
-	"error:: illegal ident "//33 非法标识符
+	"error:: ILLEGAL_CHAR  ",
+	"error:: main func overflow ， main函数后还有语句" , //14 main函数后还有语句
+	"error:: should be legal type ",//15
+	"error:: should be a comma or semicolon ", //16 var_decl/print/func 中 ，应该是一个逗号或分号
+	"error:: can't assign to a const ",//17 cant assign to a const  在赋值语句中触发
+	"error:: illegal assign type ",// 18  赋值类型不同
+	"error:: call func error / params error ",//19  函数调用错误
+	"error:: scanf error ,maybe scanf a const",// 20 scanf error
+	"error:: printf error ,maybe caused by exp error ",//21 printf error
+	"error:: illegal statement start ",//22 fei fa yu ju
+	"error:: illegal subscript 非法下标/数组越界 ",//23 非法下标
+	"error:: illegal term",//24 term错误
+	"error:: illegal factor",//25 非法factor
+	"error:: lack params ", // 26 缺少参数
+	"error:: already has identity 已定义标识符",//27 插入符号表失败
+	"error:: should be a comma or semicolon ",//28参数重合
+	"error:: illegal expression ",//29非法EXP
+	"error:: only have default ",//30 only default
+	"error:: case type error ",//31 case类型错误
+	"error:: return error 有/无返回值弄混 或 返回错误类型 ",//32 return 错误
+	"error:: illegal ident 未定义标识符 ",//33 非法标识符
+	"error:: 标识符/符号错误，请检查代码 -------  ",//34 check wrong
+	"error:: there is no main function or wrong main func ,please edit your file ", //35没有main 函数
+	"error:: have same case ,please edit your code ",   //36 case 重复
+	"error:: 常数INT型赋值了char ",//37
+	"error:: 无参函数不能有()  ",//38
+	"error:: 比较判断必须是整形" , //39
+	"error:: void函数不能作为表达式的项 "  ,//40
+	"error:: case wrong "  //41
+	
 };
 void ERR::error(int error_num , int process_way) {
 
 	error_count++;
-	cout << err_msg[error_num] << "  At " << line_count << ":" << pos_num  << endl;
+	cout << err_msg[error_num] << "     before " << line_count << ":" << pos_num  << endl;
 	switch (process_way) 
 	{
 		case 0:  return;    //local repair 
